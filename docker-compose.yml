@@ -1,0 +1,26 @@
+version: "3.9"
+
+# Only Postgres runs locally.
+# Qdrant → Qdrant Cloud
+# Redis  → Upstash / Redis Cloud
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: supportos_postgres
+    environment:
+      POSTGRES_USER: supportos
+      POSTGRES_PASSWORD: supportos
+      POSTGRES_DB: supportos
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U supportos"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:

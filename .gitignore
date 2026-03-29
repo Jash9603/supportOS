@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.so
+.env
+.venv
+venv/
+ENV/
+
+# Alembic
+backend/migrations/versions/*.pyc
+
+# Node / Frontend
+node_modules/
+dist/
+.DS_Store
+*.local
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+Thumbs.db
+Desktop.ini
+
+# Secrets — never commit these
+.env
+*.pem
+*.key
+
+
+# other
+implementation_plan.md
