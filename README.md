@@ -18,7 +18,8 @@ supportos/
 ### 1. Start infrastructure
 ```bash
 docker-compose up -d
-# Starts: Postgres (5432), Redis (6379), Qdrant (6333)
+# Starts: Postgres (5432)
+# Redis → Redis Cloud, Qdrant → Qdrant Cloud (configured in .env)
 ```
 
 ### 2. Set up environment
