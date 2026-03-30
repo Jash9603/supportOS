@@ -37,3 +37,7 @@ Desktop.ini
 
 # other
 implementation_plan.md
+
+# Local dev testing artifacts — never commit these
+backend/cookies.txt
+backend/test_*.json

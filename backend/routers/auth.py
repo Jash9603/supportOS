@@ -23,7 +23,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.config import settings
 from core.database import get_db
-from core.security import create_access_token, verify_password
+from core.security import create_access_token, verify_password, hash_password
 from dependencies import get_current_user
 from models.user import User
 from schemas.auth import LoginRequest, SignupRequest, UserResponse
@@ -32,6 +32,19 @@ from services.auth_service import (
     get_org_by_id,
     get_user_by_email,
 )
+
+# -----------------------------------------------------------------------------
+# Timing attack shield
+# -----------------------------------------------------------------------------
+# bcrypt.checkpw() takes ~100ms. If we skip it when the email doesn't exist,
+# responses for unknown emails return in ~1ms vs ~100ms for known emails.
+# An attacker can measure this difference and enumerate valid email addresses.
+#
+# Fix: ALWAYS run verify_password, even against a fake hash.
+# This makes all login attempts take the same amount of time.
+# Computed once at module import time — NOT inside the login function.
+# -----------------------------------------------------------------------------
+_DUMMY_HASH = hash_password("dummy-timing-shield")
 
 router = APIRouter()
 
@@ -130,12 +143,20 @@ async def login(
     We deliberately return the same vague error for "wrong email" and "wrong password"
     — this prevents attackers from knowing which emails are registered.
     """
-    # Find user by email
+    # Look up user by email first
     user = await get_user_by_email(db, body.email)
 
-    # Verify password (always runs verify_password even if user is None,
-    # to prevent timing attacks that could reveal valid emails)
-    if not user or not verify_password(body.password, user.hashed_password):
+    # Always run verify_password regardless of whether the user exists.
+    # Python's `or` short-circuits: `not user or not verify_password(...)` skips
+    # verify_password when user is None — making non-existent email responses
+    # measurably faster and leaking which emails are registered.
+    # Using _DUMMY_HASH ensures bcrypt always runs for ~100ms on every attempt.
+    password_ok = verify_password(
+        body.password,
+        user.hashed_password if user else _DUMMY_HASH,
+    )
+
+    if not user or not password_ok:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password",
