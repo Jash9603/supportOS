@@ -9,6 +9,8 @@ import Landing from './pages/Landing'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import ProtectedRoute from './components/ProtectedRoute'
+import DashboardLayout from './dashboard/DashboardLayout'
+import Overview from './dashboard/Overview'
 
 export default function App() {
   return (
@@ -17,9 +19,17 @@ export default function App() {
       <Route path="/login"   element={<Login />} />
       <Route path="/signup"  element={<Signup />} />
 
-      {/* Protected routes — Phase 2+ */}
+      {/* Protected routes */}
       <Route element={<ProtectedRoute />}>
-        <Route path="/dashboard/*" element={<div style={{padding:40,fontFamily:'Inter,sans-serif'}}>Dashboard coming in Phase 2 🚀</div>} />
+        <Route path="/dashboard" element={<DashboardLayout />}>
+          <Route path="" element={<Navigate to="overview" replace />} />
+          <Route path="overview" element={<Overview />} />
+          {/* Placeholders for future pages */}
+          <Route path="inbox" element={<div style={{padding:40}}>Inbox coming soon</div>} />
+          <Route path="analytics" element={<div style={{padding:40}}>Analytics coming soon</div>} />
+          <Route path="chatbot" element={<div style={{padding:40}}>Chatbot coming soon</div>} />
+          <Route path="settings" element={<div style={{padding:40}}>Settings coming soon</div>} />
+        </Route>
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

@@ -10,10 +10,14 @@ import { authApi } from '../lib/api'
 export default function ProtectedRoute() {
   const navigate = useNavigate()
   const [checking, setChecking] = useState(true)
+  const [user, setUser] = useState(null)
 
   useEffect(() => {
     authApi.me()
-      .then(() => setChecking(false))          // valid cookie → render children
+      .then((res) => {
+        setUser(res.data)
+        setChecking(false)
+      }) // valid cookie → set user & render children
       .catch(() => navigate('/login', { replace: true }))  // no cookie → send to login
   }, [navigate])
 
@@ -25,5 +29,5 @@ export default function ProtectedRoute() {
     )
   }
 
-  return <Outlet />
+  return <Outlet context={{ user }} />
 }
