@@ -1,0 +1,253 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   index.css — Global Design System
+   Editorial aesthetic: cream background, bold ink typography, amber accents.
+   All CSS tokens, texture, animations, and base styles live here.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Tokens ───────────────────────────────────────────────────────────────── */
+:root {
+  --cream: #F5F0E8;
+  --ink: #0D0D0B;
+  --ink-soft: #4A4743;
+  --amber: #C8841A;
+  --blue: #1A3FCC;
+  --border: #D4CFC4;
+  --white: #FFFFFF;
+}
+
+/* ── Base ─────────────────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--cream);
+  /* Dot grid — more spaced and editorial than fine diagonal lines */
+  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.13) 1.5px, transparent 1.5px);
+  background-size: 48px 48px;
+  color: var(--ink);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Animations ───────────────────────────────────────────────────────────── */
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes bubbleIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.8) translateY(10px);
+  }
+
+  70% {
+    transform: translateX(-50%) scale(1.04) translateY(-2px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1) translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Buttons ──────────────────────────────────────────────────────────────── */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--ink);
+  color: var(--cream);
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 12px 28px;
+  border-radius: 6px;
+  border: 1.5px solid var(--ink);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.18s, transform 0.15s;
+}
+
+.btn-primary:hover {
+  background: #2a2a28;
+  transform: translateY(-1px);
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  color: var(--ink);
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 12px 28px;
+  border-radius: 6px;
+  border: 1.5px solid var(--ink);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.18s, transform 0.15s;
+}
+
+.btn-outline:hover {
+  background: rgba(13, 13, 11, 0.06);
+  transform: translateY(-1px);
+}
+
+/* ── Form inputs ──────────────────────────────────────────────────────────── */
+.input-field {
+  width: 100%;
+  background: transparent;
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  padding: 11px 14px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.18s;
+}
+
+.input-field:focus {
+  border-color: var(--ink);
+}
+
+.input-field::placeholder {
+  color: #ABA89E;
+}
+
+/* ── Auth card ────────────────────────────────────────────────────────────── */
+.auth-card {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 40px 36px;
+  width: 100%;
+  max-width: 420px;
+}
+
+/* ── Speech bubbles ───────────────────────────────────────────────────────── */
+.speech-bubble {
+  position: absolute;
+  background: var(--white);
+  border: 1.5px solid var(--ink);
+  border-radius: 10px;
+  padding: 9px 13px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 500;
+  line-height: 1.4;
+  max-width: 160px;
+  text-align: center;
+  opacity: 0;
+  animation: bubbleIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  bottom: calc(100% + 20px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  white-space: normal;
+}
+
+/* Thought-bubble dots underneath */
+.speech-bubble::before {
+  content: '';
+  position: absolute;
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 5px;
+  height: 5px;
+  background: var(--white);
+  border: 1.5px solid var(--ink);
+  border-radius: 50%;
+}
+
+.speech-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 3px;
+  height: 3px;
+  background: var(--white);
+  border: 1.5px solid var(--ink);
+  border-radius: 50%;
+}
+
+.hi-amber {
+  color: var(--amber);
+  font-weight: 700;
+}
+
+.hi-blue {
+  color: var(--blue);
+  font-weight: 700;
+}
+
+/* ── Clothesline: card hover — instant lift, no animation ─────────────────── */
+.card-lift-wrap {
+  cursor: pointer;
+}
+
+
+
+.card-lift-wrap:hover .card-body {
+  box-shadow: 0 6px 0px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* ── Scroll-hint bounce ──────────────────────────────────────────────────────────── */
+@keyframes scrollBounce {
+
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  50% {
+    transform: translateX(-50%) translateY(7px);
+  }
+}
+
+.scroll-hint {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  animation: scrollBounce 2.2s ease-in-out infinite;
+}
