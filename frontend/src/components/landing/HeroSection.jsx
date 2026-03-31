@@ -54,13 +54,25 @@ export default function HeroSection() {
             lineHeight: 1.75,
           }}
         >
-          Your 5-person team can't be online 24/7.<br />Your AI support agent can.
+          Every unanswered ticket after hours is a canceled subscription.<br />
+          Your AI support agent handles them at 2am so you don't have to.
         </p>
 
         <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
           <Link to="/signup" className="btn-primary">Start for free →</Link>
           <Link to="/login"  className="btn-outline">I have an account</Link>
         </div>
+
+        {/* Micro-copy — removes pre-click objection */}
+        <p style={{
+          fontFamily: 'Inter, sans-serif',
+          fontSize: '0.72rem',
+          color: '#B0ABA3',
+          marginTop: 12,
+          letterSpacing: '0.01em',
+        }}>
+          No credit card required &nbsp;&middot;&nbsp; Free for first 500 tickets
+        </p>
       </div>
 
       {/* Bouncing scroll indicator */}

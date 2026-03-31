@@ -1,5 +1,7 @@
 // components/landing/HowItWorks.jsx
-// Screen 3 (min-100vh, white bg): 3-step explainer section.
+// Screen 3 (min-100vh, white bg): 3-step explainer + closing CTA.
+
+import { Link } from 'react-router-dom'
 
 const STEPS = [
   {
@@ -94,6 +96,43 @@ export default function HowItWorks() {
           </div>
         ))}
       </div>
+
+      {/* ── Closing CTA block ──────────────────────────────────────────────── */}
+      <div
+        style={{
+          marginTop: 80,
+          paddingTop: 56,
+          borderTop: '1.5px solid #E8E3D8',
+          textAlign: 'center',
+          maxWidth: 560,
+          margin: '80px auto 0',
+          width: '100%',
+        }}
+      >
+        <p
+          style={{
+            fontFamily: 'Syne, sans-serif',
+            fontWeight: 800,
+            fontSize: 'clamp(1.4rem, 2.5vw, 2rem)',
+            color: '#0D0D0B',
+            marginBottom: 10,
+            letterSpacing: '-0.02em',
+          }}
+        >
+          Your support inbox shouldn't be a source of stress.
+        </p>
+        <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.9rem', color: '#6A6661', marginBottom: 28, lineHeight: 1.6 }}>
+          Join teams who stopped losing customers to slow replies.
+        </p>
+        <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 14 }}>
+          <Link to="/signup" className="btn-primary">Start for free →</Link>
+          <Link to="/login"  className="btn-outline">I have an account</Link>
+        </div>
+        <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.72rem', color: '#B0ABA3', letterSpacing: '0.01em' }}>
+          No credit card required &nbsp;&middot;&nbsp; Free for first 500 tickets
+        </p>
+      </div>
+
     </section>
   )
 }
