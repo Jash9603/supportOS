@@ -12,6 +12,15 @@ import ProtectedRoute from './components/ProtectedRoute'
 import DashboardLayout from './dashboard/DashboardLayout'
 import Overview from './dashboard/Overview'
 import WidgetChat from './pages/widget/WidgetChat'
+import Inbox from './dashboard/inbox/Inbox'
+import { useOutletContext } from 'react-router-dom'
+
+// Wrapper to extract user from DashboardLayout's Outlet context
+// and pass it as a prop to Inbox (which needs it for API calls)
+function InboxPage() {
+  const { user } = useOutletContext()
+  return <Inbox user={user} />
+}
 
 export default function App() {
   return (
@@ -28,8 +37,8 @@ export default function App() {
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route path="" element={<Navigate to="overview" replace />} />
           <Route path="overview" element={<Overview />} />
+          <Route path="inbox" element={<InboxPage />} />
           {/* Placeholders for future pages */}
-          <Route path="inbox" element={<div style={{padding:40}}>Inbox coming soon</div>} />
           <Route path="analytics" element={<div style={{padding:40}}>Analytics coming soon</div>} />
           <Route path="chatbot" element={<div style={{padding:40}}>Chatbot coming soon</div>} />
           <Route path="settings" element={<div style={{padding:40}}>Settings coming soon</div>} />

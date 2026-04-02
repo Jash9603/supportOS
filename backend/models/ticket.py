@@ -1,10 +1,13 @@
 import uuid
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List, TYPE_CHECKING
 from sqlalchemy import String, Float, ForeignKey, DateTime, func
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from core.database import Base
+
+if TYPE_CHECKING:
+    from models.message import Message
 
 class Ticket(Base):
     __tablename__ = "tickets"
@@ -28,3 +31,13 @@ class Ticket(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
     resolved_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    # Relationship: one ticket has many messages
+    # lazy="selectin" means messages are loaded automatically when the ticket is queried
+    # This is what powers selectinload(Ticket.messages) in ticket_service.py
+    messages: Mapped[List["Message"]] = relationship(
+        "Message",
+        backref="ticket",
+        order_by="Message.created_at",
+        lazy="noload",  # Don't auto-load; we use selectinload() explicitly when needed
+    )
