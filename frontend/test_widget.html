@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Startup Website — Widget Test</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      max-width: 720px;
+      margin: 60px auto;
+      padding: 0 20px;
+      color: #333;
+    }
+    h1 { font-size: 2rem; margin-bottom: 8px; }
+    p { line-height: 1.7; color: #555; }
+  </style>
+</head>
+<body>
+  <h1>🚀 My Startup Website</h1>
+  <p>
+    This is a mock customer-facing website. The SupportOS chat widget should
+    appear as a floating bubble in the bottom-right corner.
+  </p>
+  <p>
+    Click the bubble to open the chat, type a message, and watch a new ticket
+    appear in your SupportOS dashboard inbox.
+  </p>
+  <p>
+    <strong>Instructions:</strong><br/>
+    1. Replace <code>REPLACE_WITH_YOUR_ORG_ID</code> below with your actual org UUID.<br/>
+    2. Open this file in your browser (or serve via <code>npx serve .</code>).
+  </p>
+
+  <!--
+    ==========================================
+    SupportOS Widget — just one script tag!
+    ==========================================
+  -->
+  <script
+    src="http://localhost:8000/static/widget.js"
+    data-org-id="REPLACE_WITH_YOUR_ORG_ID"
+    data-frontend-url="http://localhost:5173">
+  </script>
+</body>
+</html>

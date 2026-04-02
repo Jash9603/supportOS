@@ -11,6 +11,7 @@ import Signup from './pages/Signup'
 import ProtectedRoute from './components/ProtectedRoute'
 import DashboardLayout from './dashboard/DashboardLayout'
 import Overview from './dashboard/Overview'
+import WidgetChat from './pages/widget/WidgetChat'
 
 export default function App() {
   return (
@@ -18,6 +19,9 @@ export default function App() {
       <Route path="/"        element={<Landing />} />
       <Route path="/login"   element={<Login />} />
       <Route path="/signup"  element={<Signup />} />
+
+      {/* Public: embeddable chat widget (loaded inside iframe) */}
+      <Route path="/widget/:orgId" element={<WidgetChat />} />
 
       {/* Protected routes */}
       <Route element={<ProtectedRoute />}>

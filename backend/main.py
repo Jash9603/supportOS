@@ -60,9 +60,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ── Static files (widget.js loader — Phase 2.4) ───────
-# Uncomment when backend/static/ folder is created
-# app.mount("/static", StaticFiles(directory="static"), name="static")
+# ── Static files (widget.js loader) ────────────────────
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # ── Routers ───────────────────────────────────────────
 app.include_router(auth.router, prefix="/auth", tags=["Auth"])
