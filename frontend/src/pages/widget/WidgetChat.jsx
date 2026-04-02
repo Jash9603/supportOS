@@ -24,6 +24,8 @@ export default function WidgetChat() {
   const messagesEndRef = useRef(null)
   const reconnectTimer = useRef(null)
   const sessionId = useRef(generateSessionId())
+  const seenIds = useRef(new Set())        // Dedup guard: track message IDs we already rendered
+  const cleanedUp = useRef(false)          // StrictMode guard: prevent double connection
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {
@@ -32,7 +34,12 @@ export default function WidgetChat() {
 
   // WebSocket connection
   useEffect(() => {
+    cleanedUp.current = false
+
     function connect() {
+      // If cleanup already ran (StrictMode unmount), don't reconnect
+      if (cleanedUp.current) return
+
       const wsUrl = (import.meta.env.VITE_WS_URL || 'ws://localhost:8000')
       const ws = new WebSocket(`${wsUrl}/ws/${orgId}?session_id=${sessionId.current}`)
       wsRef.current = ws
@@ -47,16 +54,21 @@ export default function WidgetChat() {
           const data = JSON.parse(event.data)
 
           switch (data.type) {
-            case 'message':
-              // Agent or bot reply
+            case 'message': {
+              // Dedup: skip if we've already rendered this message ID
+              const msgId = data.id || ''
+              if (msgId && seenIds.current.has(msgId)) break
+              if (msgId) seenIds.current.add(msgId)
+
               setMessages(prev => [...prev, {
-                id: data.id || Date.now(),
+                id: msgId || Date.now(),
                 body: data.body,
                 sender: data.sender_type || 'agent',
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
               }])
               setStatusText(null)
               break
+            }
 
             case 'token':
               // Streaming bot token — append to last bot bubble or create one
@@ -98,8 +110,10 @@ export default function WidgetChat() {
 
       ws.onclose = () => {
         setConnected(false)
-        // Auto-reconnect after 2s
-        reconnectTimer.current = setTimeout(connect, 2000)
+        // Only reconnect if we haven't been cleaned up
+        if (!cleanedUp.current) {
+          reconnectTimer.current = setTimeout(connect, 2000)
+        }
       }
 
       ws.onerror = () => {
@@ -110,6 +124,7 @@ export default function WidgetChat() {
     connect()
 
     return () => {
+      cleanedUp.current = true              // Tell reconnect logic to stop
       clearTimeout(reconnectTimer.current)
       wsRef.current?.close()
     }

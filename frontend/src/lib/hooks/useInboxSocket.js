@@ -23,9 +23,10 @@ export default function useInboxSocket(orgId) {
   const [lastEvent, setLastEvent] = useState(null)
   const wsRef = useRef(null)
   const reconnectTimer = useRef(null)
+  const cleanedUp = useRef(false)
 
   const connect = useCallback(() => {
-    if (!orgId) return
+    if (!orgId || cleanedUp.current) return
 
     const wsUrl = (import.meta.env.VITE_WS_URL || 'ws://localhost:8000')
     const ws = new WebSocket(`${wsUrl}/inbox-ws/${orgId}`)
@@ -48,15 +49,19 @@ export default function useInboxSocket(orgId) {
 
     ws.onclose = () => {
       console.log('[InboxSocket] Disconnected, reconnecting in 3s...')
-      reconnectTimer.current = setTimeout(connect, 3000)
+      if (!cleanedUp.current) {
+        reconnectTimer.current = setTimeout(connect, 3000)
+      }
     }
 
     ws.onerror = () => ws.close()
   }, [orgId])
 
   useEffect(() => {
+    cleanedUp.current = false
     connect()
     return () => {
+      cleanedUp.current = true
       clearTimeout(reconnectTimer.current)
       wsRef.current?.close()
     }

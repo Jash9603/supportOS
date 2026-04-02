@@ -79,19 +79,24 @@ async def publish_event(redis_client, channel: str, event_type: str, payload: di
     # To avoid Pydantic/UUID serialization issues, ensure payload dict is stringified safely elsewhere or here
     await redis_client.publish(channel, json.dumps(msg, default=str))
 
+import datetime
+
 async def add_message(db: AsyncSession, redis_client, ticket: Ticket, sender_type: str, body: str, sender_id: str = None) -> Message:
     new_message = Message(
         ticket_id=ticket.id,
         sender_type=sender_type,
         sender_id=sender_id,
-        body=body
+        body=body,
+        created_at=datetime.datetime.now(datetime.timezone.utc)
     )
     db.add(new_message)
     await db.commit()
     await db.refresh(new_message)
     
-    # 1. Publish to the specific conversation session (if a customer widget is waiting)
-    if ticket.session_id:
+    # 1. Publish to the customer's widget session — but ONLY for agent/bot replies.
+    #    The customer already sees their own message instantly (optimistic rendering).
+    #    Without this guard, the customer's message echoes back as a duplicate.
+    if ticket.session_id and sender_type != "user":
         await publish_event(redis_client, f"conv:{ticket.session_id}", "message", {
             "id": str(new_message.id),
             "body": new_message.body,

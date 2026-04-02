@@ -77,8 +77,13 @@ export default function Inbox({ user }) {
   const fetchTicketDetail = async (ticketId) => {
     try {
       const res = await api.get(`/tickets/${ticketId}`)
-      setSelectedTicket(res.data)
-      setMessages(res.data.messages || [])
+      setSelectedTicket({ ...res.data })
+      // Make sure messages have string IDs for the mapped key and deduplication
+      const msgs = (res.data.messages || []).map(m => ({
+        ...m,
+        id: String(m.id)
+      }))
+      setMessages(msgs)
     } catch (err) {
       console.error('Failed to fetch ticket detail:', err)
     }
