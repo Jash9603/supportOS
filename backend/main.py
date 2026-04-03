@@ -29,7 +29,7 @@ from routers import auth
 from routers import tickets       # Piece 2.2
 from routers import widget        # Piece 2.3
 from routers import inbox_ws      # Piece 2.3
-# from routers import chatbot       # Piece 3.1
+from routers import chatbot       # Piece 3.1
 # from routers import analytics     # Piece 4.1
 
 
@@ -68,7 +68,7 @@ app.include_router(auth.router, prefix="/auth", tags=["Auth"])
 app.include_router(tickets.router,   prefix="/tickets",   tags=["Tickets"])
 app.include_router(widget.router,    tags=["Widget"])
 app.include_router(inbox_ws.router,  tags=["Inbox WS"])
-# app.include_router(chatbot.router,   prefix="/chatbot",   tags=["Chatbot"])
+app.include_router(chatbot.router,   prefix="/chatbot",   tags=["Chatbot"])
 # app.include_router(analytics.router, prefix="/analytics", tags=["Analytics"])
 
 
