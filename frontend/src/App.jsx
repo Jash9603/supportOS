@@ -13,6 +13,7 @@ import DashboardLayout from './dashboard/DashboardLayout'
 import Overview from './dashboard/Overview'
 import WidgetChat from './pages/widget/WidgetChat'
 import Inbox from './dashboard/inbox/Inbox'
+import ChatbotPage from './dashboard/chatbot/ChatbotPage'
 import { useOutletContext } from 'react-router-dom'
 
 // Wrapper to extract user from DashboardLayout's Outlet context
@@ -40,7 +41,7 @@ export default function App() {
           <Route path="inbox" element={<InboxPage />} />
           {/* Placeholders for future pages */}
           <Route path="analytics" element={<div style={{padding:40}}>Analytics coming soon</div>} />
-          <Route path="chatbot" element={<div style={{padding:40}}>Chatbot coming soon</div>} />
+          <Route path="chatbot" element={<ChatbotPage />} />
           <Route path="settings" element={<div style={{padding:40}}>Settings coming soon</div>} />
         </Route>
       </Route>

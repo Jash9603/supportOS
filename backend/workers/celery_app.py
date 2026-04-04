@@ -20,6 +20,10 @@
 #   (--pool=solo is needed on Windows, Linux can use default)
 # -----------------------------------------------------------------------------
 
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from celery import Celery
 from core.config import settings
 

@@ -48,3 +48,11 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+# Force LangSmith configuration natively into standard OS environment variables
+# (LangChain ignores Pydantic settings and only looks directly at os.environ)
+import os
+if settings.LANGSMITH_API_KEY:
+    os.environ["LANGCHAIN_TRACING_V2"] = "true"
+    os.environ["LANGCHAIN_API_KEY"] = settings.LANGSMITH_API_KEY
+    os.environ["LANGCHAIN_PROJECT"] = settings.LANGSMITH_PROJECT

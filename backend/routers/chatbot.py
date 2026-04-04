@@ -168,6 +168,25 @@ async def delete_document(
     return {"detail": "Document deleted", "id": str(doc_id)}
 
 
+# ── Get Chatbot Config ──────────────────────────────────────────────────────────
+@router.get("/config")
+async def get_chatbot_config(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get the current chatbot configuration (enabled/disabled)."""
+    result = await db.execute(
+        select(Organisation).where(Organisation.id == current_user.org_id)
+    )
+    org = result.scalars().first()
+    if not org:
+        raise HTTPException(status_code=404, detail="Organisation not found")
+        
+    return {
+        "chatbot_enabled": org.chatbot_enabled
+    }
+
+
 # ── Toggle chatbot ON/OFF ─────────────────────────────────────────────────────
 @router.patch("/toggle")
 async def toggle_chatbot(
@@ -195,9 +214,8 @@ async def toggle_chatbot(
 
 # ── Test preview ──────────────────────────────────────────────────────────────
 @router.post("/test")
-async def test_chatbot(
+def test_chatbot(
     body: ChatbotTestRequest,
-    db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -220,30 +238,29 @@ async def test_chatbot(
     # Step 2: Build context from retrieved chunks
     context = "\n---\n".join([r["text"] for r in results])
 
-    # Step 3: Generate answer with GPT-4o-mini
-    from openai import OpenAI
-    from core.config import settings
-    client = OpenAI(api_key=settings.OPENAI_API_KEY)
-
-    completion = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {
-                "role": "system",
-                "content": f"""You are a helpful support assistant.
-Answer the customer's question using ONLY the context below.
-If the context does not contain the answer, say "I don't have information about that."
-Be concise and friendly.
+    # Step 3: Generate answer with Langchain (so it's traced in LangSmith!)
+    from langchain_openai import ChatOpenAI
+    from langchain_core.messages import SystemMessage, HumanMessage
+    from langsmith import traceable
+    
+    @traceable(name="Dashboard Context Preview")
+    def _generate_test_answer(q: str, ctx: str) -> str:
+        from core.config import settings
+        llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.2, api_key=settings.OPENAI_API_KEY)
+        system_prompt = f"""You are a helpful support assistant.
+Answer the customer's question using the context provided below. You may reason, count, or summarize the text to form your answer.
+If the context is completely unrelated to the question, say "I don't have information about that."
+Be concise, helpful, and friendly.
 
 Context:
-{context}"""
-            },
-            {"role": "user", "content": body.question},
-        ],
-        max_tokens=500,
-    )
+{ctx}"""
+        messages = [
+            SystemMessage(content=system_prompt),
+            HumanMessage(content=q)
+        ]
+        return llm.invoke(messages).content
 
-    answer = completion.choices[0].message.content
+    answer = _generate_test_answer(body.question, context)
 
     return {
         "answer": answer,
