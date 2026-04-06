@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 from typing import Optional, List, TYPE_CHECKING
-from sqlalchemy import String, Float, ForeignKey, DateTime, func
+from sqlalchemy import String, Float, ForeignKey, DateTime, func, Boolean
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from core.database import Base
@@ -27,6 +27,7 @@ class Ticket(Base):
     anger_score: Mapped[float] = mapped_column(Float, default=0.0)
     topic_cluster: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
     session_id: Mapped[Optional[str]] = mapped_column(String(100), nullable=True) # links to widget WS session
+    needs_human: Mapped[bool] = mapped_column(Boolean, default=False) # True when AI escalates to human agent
     
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())

@@ -5,6 +5,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import ReactMarkdown from 'react-markdown'
 
 function generateSessionId() {
   const stored = localStorage.getItem('sos_session')
@@ -207,7 +208,13 @@ export default function WidgetChat() {
                   borderBottomLeftRadius: isCustomer ? 16 : 4,
                 }}
               >
-                <p style={styles.bubbleText}>{msg.body}</p>
+                {isCustomer ? (
+                  <p style={styles.bubbleText}>{msg.body}</p>
+                ) : (
+                  <div className="widget-md">
+                    <ReactMarkdown>{msg.body}</ReactMarkdown>
+                  </div>
+                )}
                 <span style={{
                   ...styles.bubbleTime,
                   color: isCustomer ? 'rgba(255,255,255,0.5)' : '#94A3B8',
@@ -219,15 +226,18 @@ export default function WidgetChat() {
           )
         })}
 
-        {/* Status indicator */}
+        {/* Typing indicator — engaging animation while AI thinks */}
         {statusText && (
-          <div style={styles.statusWrap}>
-            <div style={styles.statusDots}>
-              <span style={{ ...styles.dot, animationDelay: '0s' }} />
-              <span style={{ ...styles.dot, animationDelay: '0.2s' }} />
-              <span style={{ ...styles.dot, animationDelay: '0.4s' }} />
+          <div style={styles.typingWrap}>
+            <div style={styles.botAvatar}>🤖</div>
+            <div style={styles.typingBubble}>
+              <div style={styles.typingDots}>
+                <span className="typing-dot" style={{ animationDelay: '0s' }} />
+                <span className="typing-dot" style={{ animationDelay: '0.15s' }} />
+                <span className="typing-dot" style={{ animationDelay: '0.3s' }} />
+              </div>
+              <span style={styles.typingLabel}>{statusText}</span>
             </div>
-            <span style={styles.statusLabel}>{statusText}</span>
           </div>
         )}
 
@@ -255,6 +265,27 @@ export default function WidgetChat() {
           ↑
         </button>
       </div>
+      {/* CSS animations and markdown styles */}
+      <style>{`
+        @keyframes dotPulse {
+          0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+          40% { opacity: 1; transform: scale(1.2); }
+        }
+        .typing-dot {
+          width: 7px; height: 7px; border-radius: 50%;
+          background: #6366F1; display: inline-block;
+          animation: dotPulse 1.2s ease-in-out infinite;
+        }
+        /* Markdown formatting inside bot bubbles */
+        .widget-md { font-size: 0.85rem; line-height: 1.6; word-break: break-word; }
+        .widget-md p { margin: 0 0 8px 0; }
+        .widget-md p:last-child { margin-bottom: 0; }
+        .widget-md ul, .widget-md ol { margin: 4px 0 8px 0; padding-left: 18px; }
+        .widget-md li { margin-bottom: 2px; }
+        .widget-md strong { font-weight: 600; }
+        .widget-md code { background: #E2E8F0; padding: 1px 4px; border-radius: 3px; font-size: 0.8em; }
+        .widget-md h1, .widget-md h2, .widget-md h3 { font-size: 0.9rem; font-weight: 700; margin: 8px 0 4px; }
+      `}</style>
     </div>
   )
 }
@@ -346,27 +377,30 @@ const styles = {
     marginTop: 4,
     textAlign: 'right',
   },
-  statusWrap: {
+  typingWrap: {
     display: 'flex',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     gap: 8,
     padding: '8px 0',
+    marginBottom: 10,
   },
-  statusDots: {
+  typingBubble: {
+    background: '#F1F5F9',
+    borderRadius: '16px 16px 16px 4px',
+    padding: '10px 14px',
     display: 'flex',
-    gap: 3,
+    flexDirection: 'column',
+    gap: 6,
   },
-  dot: {
-    width: 6,
-    height: 6,
-    borderRadius: '50%',
-    background: '#94A3B8',
-    animation: 'dotPulse 1s ease-in-out infinite',
+  typingDots: {
+    display: 'flex',
+    gap: 4,
+    justifyContent: 'center',
   },
-  statusLabel: {
-    fontSize: '0.78rem',
-    color: '#64748B',
-    fontStyle: 'italic',
+  typingLabel: {
+    fontSize: '0.72rem',
+    color: '#6366F1',
+    fontWeight: 500,
   },
   inputBar: {
     display: 'flex',

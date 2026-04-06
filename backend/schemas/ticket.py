@@ -27,6 +27,7 @@ class TicketUpdate(BaseModel):
     status: Optional[str] = None
     priority: Optional[str] = None
     assigned_to: Optional[uuid.UUID] = None
+    needs_human: Optional[bool] = None
 
 class TicketResponse(BaseModel):
     id: uuid.UUID
@@ -41,6 +42,7 @@ class TicketResponse(BaseModel):
     anger_score: float
     topic_cluster: Optional[str] = None
     session_id: Optional[str] = None
+    needs_human: bool = False
     created_at: datetime
     updated_at: datetime
     resolved_at: Optional[datetime] = None

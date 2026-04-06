@@ -209,7 +209,7 @@ async def widget_websocket(
                 else:
                     # The AI answered successfully. Save the full reply in the DB permanently.
                     bot_reply = "".join(full_reply)
-                    await ticket_service.add_message(db, redis, ticket, "bot", bot_reply, session_id)
+                    await ticket_service.add_message(db, redis, ticket, "bot", bot_reply, session_id, skip_ws_publish=True)
                 
                 # Save the new memory for next time
                 await save_state(redis, session_id, final_state)

@@ -59,6 +59,8 @@ async def update_ticket(db: AsyncSession, ticket_id: uuid.UUID, data: TicketUpda
         ticket.priority = data.priority
     if data.assigned_to is not None:
         ticket.assigned_to = data.assigned_to
+    if data.needs_human is not None:
+        ticket.needs_human = data.needs_human
         
     await db.commit()
     await db.refresh(ticket)
@@ -81,7 +83,7 @@ async def publish_event(redis_client, channel: str, event_type: str, payload: di
 
 import datetime
 
-async def add_message(db: AsyncSession, redis_client, ticket: Ticket, sender_type: str, body: str, sender_id: str = None) -> Message:
+async def add_message(db: AsyncSession, redis_client, ticket: Ticket, sender_type: str, body: str, sender_id: str = None, skip_ws_publish: bool = False) -> Message:
     new_message = Message(
         ticket_id=ticket.id,
         sender_type=sender_type,
@@ -95,8 +97,8 @@ async def add_message(db: AsyncSession, redis_client, ticket: Ticket, sender_typ
     
     # 1. Publish to the customer's widget session — but ONLY for agent/bot replies.
     #    The customer already sees their own message instantly (optimistic rendering).
-    #    Without this guard, the customer's message echoes back as a duplicate.
-    if ticket.session_id and sender_type != "user":
+    #    skip_ws_publish=True when the bot already streamed tokens directly over WebSocket.
+    if ticket.session_id and sender_type != "user" and not skip_ws_publish:
         await publish_event(redis_client, f"conv:{ticket.session_id}", "message", {
             "id": str(new_message.id),
             "body": new_message.body,
