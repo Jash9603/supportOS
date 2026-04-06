@@ -213,6 +213,12 @@ async def toggle_chatbot(
 
 
 # ── Test preview ──────────────────────────────────────────────────────────────
+# IMPORTANT: This endpoint is intentionally a sync `def`, NOT `async def`.
+# Reason: LangSmith's @traceable decorator and LangChain's ChatOpenAI use
+# synchronous HTTP calls internally. If this were async, those calls would
+# deadlock the FastAPI event loop (we hit this exact bug during development).
+# FastAPI automatically runs sync endpoints in a separate threadpool, which
+# avoids the deadlock entirely. Do NOT change this to async without testing.
 @router.post("/test")
 def test_chatbot(
     body: ChatbotTestRequest,
