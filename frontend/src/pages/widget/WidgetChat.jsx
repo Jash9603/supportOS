@@ -4,7 +4,7 @@
 // Handles message types: token, message, waiting, escalated, error
 
 import { useEffect, useRef, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 
 function generateSessionId() {
@@ -17,6 +17,9 @@ function generateSessionId() {
 
 export default function WidgetChat() {
   const { orgId } = useParams()
+  const [searchParams] = useSearchParams()
+  const userId = searchParams.get('user_id') || 'default'
+
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const [connected, setConnected] = useState(false)
@@ -33,6 +36,24 @@ export default function WidgetChat() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, statusText])
 
+  // Load chat history
+  useEffect(() => {
+    async function loadHistory() {
+      try {
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+        const res = await fetch(`${apiUrl}/widget/${orgId}/history?session_id=${sessionId.current}`)
+        if (res.ok) {
+          const data = await res.json()
+          setMessages(data)
+          data.forEach(msg => seenIds.current.add(msg.id))
+        }
+      } catch (e) {
+        console.error("Failed to load history", e)
+      }
+    }
+    loadHistory()
+  }, [orgId])
+
   // WebSocket connection
   useEffect(() => {
     cleanedUp.current = false
@@ -42,7 +63,7 @@ export default function WidgetChat() {
       if (cleanedUp.current) return
 
       const wsUrl = (import.meta.env.VITE_WS_URL || 'ws://localhost:8000')
-      const ws = new WebSocket(`${wsUrl}/ws/${orgId}?session_id=${sessionId.current}`)
+      const ws = new WebSocket(`${wsUrl}/ws/${orgId}?session_id=${sessionId.current}&user_id=${encodeURIComponent(userId)}`)
       wsRef.current = ws
 
       ws.onopen = () => {
@@ -91,10 +112,6 @@ export default function WidgetChat() {
 
             case 'waiting':
               setStatusText(data.message)
-              break
-
-            case 'escalated':
-              setStatusText(data.message || 'Connecting you with our support team…')
               break
 
             case 'error':
@@ -181,7 +198,7 @@ export default function WidgetChat() {
         )}
 
         {messages.map((msg) => {
-          const isCustomer = msg.sender === 'customer'
+          const isCustomer = (msg.sender === 'customer' || msg.sender === 'user')
           return (
             <div
               key={msg.id}
@@ -196,7 +213,7 @@ export default function WidgetChat() {
               {/* Avatar for non-customer */}
               {!isCustomer && (
                 <div style={styles.botAvatar}>
-                  {msg.sender === 'bot' ? '🤖' : '🧑‍💼'}
+                  {msg.sender === 'bot' ? 'AI' : 'S'}
                 </div>
               )}
               <div
@@ -229,7 +246,7 @@ export default function WidgetChat() {
         {/* Typing indicator — engaging animation while AI thinks */}
         {statusText && (
           <div style={styles.typingWrap}>
-            <div style={styles.botAvatar}>🤖</div>
+            <div style={styles.botAvatar}>AI</div>
             <div style={styles.typingBubble}>
               <div style={styles.typingDots}>
                 <span className="typing-dot" style={{ animationDelay: '0s' }} />

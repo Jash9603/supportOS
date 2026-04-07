@@ -223,7 +223,7 @@ export default function Inbox({ user }) {
               >
                 {/* Channel icon */}
                 <span style={styles.channelIcon}>
-                  {ticket.channel === 'email' ? '✉️' : '💬'}
+                  {ticket.channel === 'email' ? 'E' : 'C'}
                 </span>
 
                 <div style={{ flex: 1, overflow: 'hidden' }}>
@@ -259,7 +259,7 @@ export default function Inbox({ user }) {
       <div style={styles.detailPanel}>
         {!selectedTicket ? (
           <div style={styles.emptyDetail}>
-            <span style={{ fontSize: '2.5rem' }}>📬</span>
+            <span style={{ fontSize: '1.2rem', fontWeight: 700, color: '#94A3B8' }}>Inbox</span>
             <p style={{ color: '#94A3B8', marginTop: 12 }}>Select a ticket to view the conversation</p>
           </div>
         ) : (
@@ -292,22 +292,23 @@ export default function Inbox({ user }) {
                 messages.map((msg) => {
                   const isAgent = msg.sender_type === 'agent'
                   const isBot = msg.sender_type === 'bot'
+                  const isAgentOrBot = (isAgent || isBot)
                   return (
                     <div
                       key={msg.id}
                       style={{
                         display: 'flex',
-                        justifyContent: isAgent ? 'flex-end' : 'flex-start',
+                        justifyContent: isAgentOrBot ? 'flex-end' : 'flex-start',
                         marginBottom: 14,
                       }}
                     >
-                      {/* Avatar for customer/bot */}
-                      {!isAgent && (
+                      {/* Avatar for customer/user (Left Side) */}
+                      {!isAgentOrBot && (
                         <div style={{
                           ...styles.msgAvatar,
-                          background: isBot ? '#EEF2FF' : '#F1F5F9',
+                          background: '#F1F5F9', color: '#1E293B',
                         }}>
-                          {isBot ? '🤖' : msg.sender_type === 'user' ? '👤' : '?'}
+                          {msg.sender_type === 'user' ? 'U' : '?'}
                         </div>
                       )}
 
@@ -315,30 +316,35 @@ export default function Inbox({ user }) {
                         maxWidth: '65%',
                         padding: '10px 14px',
                         borderRadius: 12,
-                        background: isAgent ? '#0F172A' : '#F1F5F9',
-                        color: isAgent ? '#FFFFFF' : '#1E293B',
-                        borderBottomRightRadius: isAgent ? 4 : 12,
-                        borderBottomLeftRadius: isAgent ? 12 : 4,
+                        background: isAgentOrBot ? '#0F172A' : '#F1F5F9',
+                        color: isAgentOrBot ? '#FFFFFF' : '#1E293B',
+                        borderBottomRightRadius: isAgentOrBot ? 4 : 12,
+                        borderBottomLeftRadius: isAgentOrBot ? 12 : 4,
                       }}>
                         <p style={{ margin: 0, fontSize: '0.88rem', lineHeight: 1.5 }}>{msg.body}</p>
                         <span style={{
                           display: 'block', fontSize: '0.65rem', marginTop: 4,
-                          color: isAgent ? 'rgba(255,255,255,0.5)' : '#94A3B8',
-                          textAlign: isAgent ? 'right' : 'left',
+                          color: isAgentOrBot ? 'rgba(255,255,255,0.5)' : '#94A3B8',
+                          textAlign: isAgentOrBot ? 'right' : 'left',
                         }}>
-                          {isBot ? '🤖 Bot' : isAgent ? 'You' : selectedTicket.requester_name}
+                          {isBot ? 'Support AI' : isAgent ? 'You' : selectedTicket.requester_name}
                           {' · '}
                           {timeAgo(msg.created_at)}
                         </span>
                       </div>
 
-                      {/* Avatar for agent */}
-                      {isAgent && (
+                      {/* Avatar for agent or bot (Right Side) */}
+                      {isAgentOrBot && (
                         <div style={{
                           ...styles.msgAvatar,
-                          background: '#6366F1', color: '#FFF', marginLeft: 8, marginRight: 0,
+                          background: isBot ? '#334155' : '#6366F1', 
+                          color: '#FFF', 
+                          marginLeft: 8, 
+                          marginRight: 0,
+                          fontSize: isBot ? '0.6rem' : '0.8rem',
+                          fontWeight: isBot ? 800 : 600,
                         }}>
-                          {(user?.name || 'A').charAt(0)}
+                          {isBot ? 'AI' : (user?.name || 'A').charAt(0)}
                         </div>
                       )}
                     </div>

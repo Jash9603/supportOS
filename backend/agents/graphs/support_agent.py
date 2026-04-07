@@ -124,7 +124,7 @@ def escalation_check_node(state: SupportState) -> dict:
 # Calls GPT-4o-mini with the retrieved context to generate an answer.
 # Detects if the bot gave a "I don't know" fallback and increments failure count.
 
-def responder_node(state: SupportState) -> dict:
+async def responder_node(state: SupportState) -> dict:
     """
     Generate an AI response using the retrieved knowledge base chunks.
 
@@ -146,9 +146,10 @@ def responder_node(state: SupportState) -> dict:
         api_key=settings.OPENAI_API_KEY,
         temperature=0.3,       # Low temperature = more factual, less creative
         max_tokens=500,
+        streaming=True,        # CRITICAL for real-time WebSocket bubbling
     )
 
-    result = llm.invoke([
+    result = await llm.ainvoke([
         SystemMessage(content=system_prompt),
         HumanMessage(content=state["query"]),
     ])

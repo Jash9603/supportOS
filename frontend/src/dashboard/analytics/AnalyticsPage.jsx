@@ -118,7 +118,7 @@ export default function AnalyticsPage() {
   if (!data) {
     return (
       <div style={{ ...s.page, textAlign: 'center', paddingTop: 120 }}>
-        <div style={{ fontSize: '3rem' }}>📊</div>
+        <div style={{ fontSize: '1.6rem', fontWeight: 700, color: '#64748B' }}>No Data</div>
         <h2 style={{ color: C.dark }}>No analytics data yet</h2>
         <p style={{ color: C.slate }}>Start receiving tickets to see insights here.</p>
       </div>
@@ -155,7 +155,7 @@ export default function AnalyticsPage() {
             <option value={90}>Last 90 days</option>
           </select>
           <button onClick={handleExport} style={s.exportBtn} disabled={exporting}>
-            {exporting ? '⏳ Generating...' : '📄 Export PDF'}
+            {exporting ? 'Generating...' : 'Export PDF'}
           </button>
         </div>
       </div>
@@ -164,7 +164,7 @@ export default function AnalyticsPage() {
       <div ref={reportRef}>
         <div style={s.grid2}>
           {/* Satisfaction Trend */}
-          <Card title="📊 Customer Satisfaction" subtitle="Higher is better (100 = happy)">
+          <Card title="Customer Satisfaction" subtitle="Higher is better (100 = happy)">
             <ResponsiveContainer width="100%" height={220}>
               <AreaChart data={satisfaction_trend} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
                 <defs>
@@ -184,7 +184,7 @@ export default function AnalyticsPage() {
           </Card>
 
           {/* Top Questions */}
-          <Card title="🔥 Top Customer Questions" subtitle="AI-clustered by topic similarity">
+          <Card title="Top Customer Questions" subtitle="AI-clustered by topic similarity">
             {top_questions.length === 0 ? (
               <div style={s.emptyState}>No questions yet</div>
             ) : (
@@ -204,7 +204,7 @@ export default function AnalyticsPage() {
 
         <div style={s.grid3}>
           {/* Resolution Breakdown */}
-          <Card title="🤖 Resolution Breakdown" subtitle="Who handled the tickets?">
+          <Card title="Resolution Breakdown" subtitle="Who handled the tickets?">
             {donutData.length === 0 ? (
               <div style={s.emptyState}>No resolved tickets yet</div>
             ) : (
@@ -223,12 +223,12 @@ export default function AnalyticsPage() {
           </Card>
 
           {/* Peak Hours Heatmap */}
-          <Card title="🕐 Peak Support Hours" subtitle="When customers need help most">
+          <Card title="Peak Support Hours" subtitle="When customers need help most">
             <Heatmap grid={peak_hours.grid} maxValue={peak_hours.max_value} />
           </Card>
 
           {/* Escalation Rate */}
-          <Card title="📈 Escalation Rate" subtitle="% of tickets needing human help">
+          <Card title="Escalation Rate" subtitle="% of tickets needing human help">
             <ResponsiveContainer width="100%" height={220}>
               <AreaChart data={escalation_trend} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
                 <defs>
@@ -250,19 +250,19 @@ export default function AnalyticsPage() {
 
         {/* Response Time Comparison — full width */}
         <div style={{ marginTop: 20 }}>
-          <Card title="⚡ Response Time: Bot vs Human" subtitle="Average first-reply time in minutes">
+          <Card title="Response Time: Bot vs Human" subtitle="Average first-reply time in minutes">
             <ResponsiveContainer width="100%" height={240}>
               <LineChart data={response_time_trend} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
                 <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#94A3B8' }} tickFormatter={fmtDate} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 11, fill: '#94A3B8' }} axisLine={false} tickLine={false} unit="m" />
                 <Tooltip contentStyle={tooltipStyle} labelFormatter={fmtDateFull}
-                  formatter={(v, name) => [`${v} min`, name === 'bot_avg' ? '🤖 Bot' : '👤 Human']} />
+                  formatter={(v, name) => [`${v} min`, name === 'bot_avg' ? 'Bot' : 'Human']} />
                 <Line type="monotone" dataKey="bot_avg" stroke={C.indigo} strokeWidth={2.5} name="bot_avg"
                   dot={{ fill: C.indigo, r: 4, strokeWidth: 0 }} />
                 <Line type="monotone" dataKey="human_avg" stroke={C.amber} strokeWidth={2.5} name="human_avg"
                   dot={{ fill: C.amber, r: 4, strokeWidth: 0 }} strokeDasharray="6 3" />
-                <Legend formatter={v => v === 'bot_avg' ? '🤖 Bot' : '👤 Human'}
+                <Legend formatter={v => v === 'bot_avg' ? 'Bot' : 'Human'}
                   iconType="line" iconSize={16} />
               </LineChart>
             </ResponsiveContainer>

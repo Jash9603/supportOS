@@ -17,9 +17,10 @@
 import asyncio
 import json
 import uuid
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, Query
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, Query, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from sqlalchemy.orm import selectinload
 
 from core.database import get_db
 from core.redis import get_redis
@@ -104,6 +105,7 @@ async def widget_websocket(
     websocket: WebSocket, 
     org_id: uuid.UUID, 
     session_id: str = Query(...),
+    user_id: str = Query("default"),
     db: AsyncSession = Depends(get_db),
     redis = Depends(get_redis)
 ):
@@ -140,11 +142,23 @@ async def widget_websocket(
             # If they already have an active folder, grab it. Otherwise, create a new one.
             ticket = await ticket_service.get_ticket_by_session(db, org_id, session_id)
             if not ticket:
+                # Calculate ticket number (e.g. "Ticket 5")
+                from sqlalchemy import func
+                from models.ticket import Ticket
+                count_res = await db.execute(select(func.count()).where(Ticket.org_id == org_id))
+                ticket_number = count_res.scalar() + 1
+                
+                # Determine subject based on user_id
+                if user_id and user_id != "default":
+                    subject = f"User: {user_id}"
+                else:
+                    subject = f"Ticket {ticket_number}"
+
                 ticket_data = TicketCreate(
                     channel="chat",
-                    subject=body[:50] + "..." if len(body) > 50 else body, # Make the subject the first 50 chars
+                    subject=subject,
                     requester_email="guest@example.com", 
-                    requester_name="Guest User",
+                    requester_name=f"User {user_id}" if user_id and user_id != "default" else "Guest User",
                     session_id=session_id
                 )
                 ticket = await ticket_service.create_ticket(db, org_id, ticket_data)
@@ -195,32 +209,43 @@ async def widget_websocket(
 
                 # Process outcome: Let's see how the AI did.
                 if final_state.get("needs_escalation"):
-                    # The AI panicked and triggered an escalation (either the user said "Talk to human" or the bot didn't know the answer)
+                    escalated_msg = "I'm connecting you with our support team now."
+                    
+                    # The AI panicked and triggered an escalation
                     await websocket.send_text(json.dumps({
-                        "type": "escalated",
-                        "message": "I'm connecting you with our support team now."
+                        "type": "message",
+                        "body": escalated_msg,
+                        "sender_type": "bot"
                     }))
                     
                     # Flip the switch! Mark this ticket as needing a real human.
-                    ticket = await ticket_service.update_ticket(db, ticket.id, TicketUpdate(needs_human=True))
+                    # We also auto-assign it to the organisation's owner so it appears in "Assigned to me"
+                    from models.user import User
+                    owner_res = await db.execute(select(User).where(User.org_id == org_id, User.role == "owner").limit(1))
+                    owner = owner_res.scalars().first()
+                    
+                    update_data = TicketUpdate(needs_human=True)
+                    if owner:
+                        update_data.assigned_to = owner.id
+                        
+                    ticket = await ticket_service.update_ticket(db, ticket.id, update_data)
                     
                     # Ring the bell in the Admin's inbox to notify them that a human is needed!
                     await ticket_service.publish_event(redis, f"tickets:{org_id}", "ticket_updated", {"ticket_id": str(ticket.id)})
+                    
+                    # Save the message permanently so it's visible on refresh and to the human agent
+                    await ticket_service.add_message(db, redis, ticket, "bot", escalated_msg, session_id, skip_ws_publish=True)
                 else:
                     # The AI answered successfully. Save the full reply in the DB permanently.
-                    bot_reply = "".join(full_reply)
+                    bot_reply = final_state.get("response", "".join(full_reply))
                     await ticket_service.add_message(db, redis, ticket, "bot", bot_reply, session_id, skip_ws_publish=True)
                 
                 # Save the new memory for next time
                 await save_state(redis, session_id, final_state)
 
-            else:
-                # If the bot is completely disabled, OR the ticket was already escalated 
-                # to a human, we just politely tell the customer to wait.
-                await websocket.send_json({
-                    "type": "waiting", 
-                    "message": "An agent will be with you shortly."
-                })
+            # If the bot is disabled or the ticket is escalated, we just skip the AI part.
+            # The customer's message was already saved to DB on line 166, so it's safely logged!
+            pass
                 
     except WebSocketDisconnect:
         # Expected: The customer closed their browser tab.
@@ -231,3 +256,44 @@ async def widget_websocket(
     finally:
         # No matter what happens, kill the invisible mail carrier so it doesn't drain memory!
         listener_task.cancel()
+
+
+@router.get("/widget/{org_id}/history")
+async def get_chat_history(
+    org_id: uuid.UUID,
+    session_id: str = Query(...),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Fetches the chat history for a given widget session so the customer
+    can see their previous messages if they refresh the page.
+    """
+    from models.ticket import Ticket
+    from models.message import Message
+    
+    # 1. Find the ticket for this session
+    res = await db.execute(select(Ticket).where(Ticket.org_id == org_id, Ticket.session_id == session_id).limit(1))
+    ticket = res.scalars().first()
+    
+    if not ticket:
+        return []
+        
+    # 2. Grab all messages
+    msg_res = await db.execute(
+        select(Message)
+        .where(Message.ticket_id == ticket.id)
+        .order_by(Message.created_at.asc())
+    )
+    messages = msg_res.scalars().all()
+    
+    # 3. Format for the frontend WidgetChat
+    return [
+        {
+            "id": str(msg.id),
+            "body": msg.body,
+            "sender": msg.sender_type,
+            "time": msg.created_at.strftime("%I:%M %p")
+        }
+        for msg in messages
+    ]
+

@@ -49,18 +49,19 @@ Step 5: Your kitchen gets the order (Ticket created in Postgres)
 */
 (function () {
   var script = document.currentScript;
-  var orgId = script.getAttribute("data-org-id");
-  var frontendUrl =
-    script.getAttribute("data-frontend-url") || "http://localhost:5173";
+  var orgId = window.SUPPORT_OS_ORG_ID || (script ? script.getAttribute("data-org-id") : null);
+  var frontendUrl = window.SUPPORT_OS_FRONTEND_URL || (script ? script.getAttribute("data-frontend-url") : null) || "http://localhost:5173";
+  var userId = window.SUPPORT_OS_USER_ID || "default";
 
   if (!orgId) {
-    console.error("[SupportOS] Missing data-org-id attribute on script tag.");
+    console.error("[SupportOS] Missing window.SUPPORT_OS_ORG_ID or data-org-id attribute on script tag.");
     return;
   }
 
   // ── Iframe (chat window) ────────────────────────────────
   var iframe = document.createElement("iframe");
-  iframe.src = frontendUrl + "/widget/" + orgId;
+  // Pass user_id down to the React app via query params
+  iframe.src = frontendUrl + "/widget/" + orgId + "?user_id=" + encodeURIComponent(userId);
   iframe.style.cssText =
     "position:fixed;" +
     "bottom:88px;" +

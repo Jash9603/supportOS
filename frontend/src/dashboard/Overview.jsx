@@ -46,10 +46,6 @@ export default function Overview() {
           <h1 style={styles.title}>Overview</h1>
           <p style={styles.subtitle}>Your support operations at a glance</p>
         </div>
-        <div style={styles.liveTag}>
-          <span style={styles.liveDot} />
-          Live Data
-        </div>
       </div>
 
       {/* ── KPI Cards ── */}
@@ -58,28 +54,24 @@ export default function Overview() {
           label="Total Tickets"
           value={summary.total_tickets_7d}
           sub="Last 7 days"
-          icon="📩"
           color="#6366F1"
         />
         <KpiCard
           label="Open Now"
           value={summary.open_tickets}
           sub="Awaiting resolution"
-          icon="🔓"
           color="#F59E0B"
         />
         <KpiCard
           label="Avg Response"
           value={formatResponseTime(summary.avg_response_mins)}
           sub="First reply time"
-          icon="⚡"
           color="#10B981"
         />
         <KpiCard
           label="Bot Resolution"
           value={`${summary.bot_resolution_pct}%`}
           sub="Resolved without human"
-          icon="🤖"
           color="#8B5CF6"
         />
       </div>
@@ -197,17 +189,12 @@ export default function Overview() {
 
 // ── Sub-components ──────────────────────────────────────────────────────────
 
-function KpiCard({ label, value, sub, icon, color }) {
+function KpiCard({ label, value, sub, color }) {
   return (
     <div style={styles.kpiCard}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <div>
-          <div style={styles.kpiLabel}>{label}</div>
-          <div style={{ ...styles.kpiValue, color }}>{value}</div>
-        </div>
-        <div style={{ ...styles.kpiIcon, background: `${color}15` }}>
-          <span style={{ fontSize: '1.4rem' }}>{icon}</span>
-        </div>
+      <div>
+        <div style={styles.kpiLabel}>{label}</div>
+        <div style={{ ...styles.kpiValue, color }}>{value}</div>
       </div>
       <div style={styles.kpiSub}>{sub}</div>
     </div>
@@ -240,7 +227,7 @@ function RouteBadge({ needsHuman }) {
       padding: '4px 10px', borderRadius: 20,
       fontSize: '0.75rem', fontWeight: 600,
     }}>
-      {needsHuman ? '👤 Human' : '🤖 Bot'}
+      {needsHuman ? 'Human' : 'Bot'}
     </span>
   )
 }
@@ -275,7 +262,7 @@ function LoadingSkeleton() {
 function ErrorState({ message }) {
   return (
     <div style={{ ...styles.container, textAlign: 'center', paddingTop: 120 }}>
-      <div style={{ fontSize: '3rem', marginBottom: 16 }}>⚠️</div>
+      <div style={{ fontSize: '1.6rem', fontWeight: 700, color: '#EF4444', marginBottom: 16 }}>Error</div>
       <h2 style={{ color: '#0F172A', marginBottom: 8 }}>Failed to load analytics</h2>
       <p style={{ color: '#64748B' }}>{message}</p>
     </div>
