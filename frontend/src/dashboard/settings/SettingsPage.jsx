@@ -182,7 +182,7 @@ export default function RootLayout({ children }) {
             </div>
             <div style={s.formGroup}>
               <label style={s.label}>Current Plan</label>
-              <input type="text" style={s.inputDisabled} value="Free Tier (MVP)" disabled />
+              <input type="text" style={s.inputDisabled} value="Free Trial" disabled />
             </div>
           </div>
           <div style={s.cardFooter}>

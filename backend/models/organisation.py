@@ -37,6 +37,13 @@ class Organisation(Base):
     plan: Mapped[str] = mapped_column(String(50), default="free", nullable=False)
     chatbot_enabled: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     chatbot_config: Mapped[dict] = mapped_column(JSONB, default=dict, nullable=False)
+    allowed_domains: Mapped[list[str]] = mapped_column(JSONB, default=list, nullable=False)
+    
+    # Billing
+    paypal_sub_id: Mapped[str] = mapped_column(String(255), nullable=True)
+    sub_status: Mapped[str] = mapped_column(String(50), default="inactive", nullable=False)
+    trial_ends_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
+    
     onboarding_completed: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False

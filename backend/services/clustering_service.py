@@ -45,7 +45,7 @@ def cluster_questions(subjects: list[str], top_n: int = 8) -> list[dict]:
     # If very few unique subjects, skip embeddings — just return counts
     if len(unique_subjects) <= top_n:
         result = [
-            {"question": s.capitalize(), "count": subject_counts[s]}
+            {"question": s.capitalize(), "count": subject_counts[s], "summary": s.capitalize()}
             for s in sorted(unique_subjects, key=lambda x: subject_counts[x], reverse=True)
         ]
         return result[:top_n]
@@ -62,7 +62,7 @@ def cluster_questions(subjects: list[str], top_n: int = 8) -> list[dict]:
         print(f"[clustering] Embedding failed: {e}")
         # Fallback: return simple frequency counts
         result = [
-            {"question": s.capitalize(), "count": subject_counts[s]}
+            {"question": s.capitalize(), "count": subject_counts[s], "summary": s.capitalize()}
             for s in sorted(unique_subjects, key=lambda x: subject_counts[x], reverse=True)
         ]
         return result[:top_n]
@@ -72,7 +72,12 @@ def cluster_questions(subjects: list[str], top_n: int = 8) -> list[dict]:
 
     # Sort by total count, take top N
     clusters.sort(key=lambda c: c["count"], reverse=True)
-    return clusters[:top_n]
+    top_clusters = clusters[:top_n]
+    
+    # Generate AI summaries for each cluster
+    top_clusters = _generate_summaries(top_clusters)
+    
+    return top_clusters
 
 
 def _greedy_cluster(
@@ -118,6 +123,48 @@ def _greedy_cluster(
         clusters.append({
             "question": subjects[best_label].capitalize(),
             "count": total_count,
+            "members": [subjects[idx] for idx in cluster_indices],
         })
 
+    return clusters
+
+
+def _generate_summaries(clusters: list[dict]) -> list[dict]:
+    """Use GPT-4o-mini to generate a one-sentence summary for each cluster."""
+    if not clusters:
+        return clusters
+    
+    try:
+        client = OpenAI(api_key=settings.OPENAI_API_KEY)
+        
+        for cluster in clusters:
+            members = cluster.get("members", [])
+            if len(members) <= 1:
+                cluster["summary"] = cluster["question"]
+                continue
+            
+            # Take up to 10 representative questions
+            sample = members[:10]
+            questions_text = "\n".join(f"- {q}" for q in sample)
+            
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[{
+                    "role": "user",
+                    "content": f"Summarize what these customer support questions are about in ONE short sentence (max 15 words). Do not use quotes.\n\n{questions_text}"
+                }],
+                max_tokens=40,
+                temperature=0.2,
+            )
+            cluster["summary"] = response.choices[0].message.content.strip()
+            
+            # Remove members from final output (not needed by frontend)
+            del cluster["members"]
+    except Exception as e:
+        print(f"[clustering] Summary generation failed: {e}")
+        for cluster in clusters:
+            cluster["summary"] = cluster["question"]
+            if "members" in cluster:
+                del cluster["members"]
+    
     return clusters

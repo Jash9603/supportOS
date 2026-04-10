@@ -32,6 +32,7 @@ from routers import inbox_ws      # Piece 2.3
 from routers import chatbot       # Piece 3.1
 from routers import analytics     # Piece 4.1
 from routers import settings as settings_router # Settings
+from routers import billing
 
 
 # ── Lifespan (startup / shutdown) ────────────────────
@@ -72,6 +73,7 @@ app.include_router(inbox_ws.router,  tags=["Inbox WS"])
 app.include_router(chatbot.router,   prefix="/chatbot",   tags=["Chatbot"])
 app.include_router(analytics.router, prefix="/analytics", tags=["Analytics"])
 app.include_router(settings_router.router,  prefix="/settings",  tags=["Settings"])
+app.include_router(billing.router, prefix="/billing", tags=["Billing"])
 
 
 # ── Health check ──────────────────────────────────────

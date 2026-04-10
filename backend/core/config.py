@@ -37,7 +37,10 @@ class Settings(BaseSettings):
 
     # LangSmith (optional)
     LANGSMITH_API_KEY: str = ""
-    LANGSMITH_PROJECT: str = "supportos-mvp"
+    LANGSMITH_PROJECT: str = "supportos-prod"
+
+    # Lemon Squeezy
+    LEMON_SQUEEZY_WEBHOOK_SECRET: str = ""
 
     @property
     def origins_list(self) -> list[str]:

@@ -120,7 +120,6 @@ export default function DashboardLayout() {
           <span style={styles.logoText}>
             Support<span style={{ color: '#F59E0B' }}>OS</span>
           </span>
-          <span style={styles.badge}>MVP</span>
         </div>
 
         {/* ── Navigation Links ────────────────────────────────── */}

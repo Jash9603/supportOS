@@ -40,5 +40,7 @@ class UserResponse(BaseModel):
     org_id: uuid.UUID
     org_name: str         # org's display name (handy so frontend doesn't need a second API call)
     org_slug: str
+    sub_status: str
+    trial_ends_at: str | None = None
 
     model_config = {"from_attributes": True}  # allows building from SQLAlchemy model objects

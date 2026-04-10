@@ -49,6 +49,7 @@ class TopQuestion(BaseModel):
     """A cluster of similar customer questions."""
     question: str
     count: int
+    summary: str = ""
 
 
 class ResolutionBreakdown(BaseModel):

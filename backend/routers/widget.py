@@ -123,6 +123,17 @@ async def widget_websocket(
         await websocket.close()
         return
 
+    # 1.5 Security: Check if the widget is embedded on an allowed domain
+    origin = websocket.headers.get("origin")
+    if origin and org.allowed_domains and len(org.allowed_domains) > 0:
+        import urllib.parse
+        parsed = urllib.parse.urlparse(origin)
+        domain = parsed.netloc if parsed.netloc else parsed.path
+        if not any(d.lower() in domain.lower() for d in org.allowed_domains):
+            await websocket.send_json({"type": "error", "message": f"Unauthorized domain: {domain}"})
+            await websocket.close()
+            return
+
     # 2. Assign the "invisible mail carrier" (Redis listener) to watch for 
     # incoming replies from Human Agents or the system.
     channel_name = f"conv:{session_id}"
@@ -135,6 +146,9 @@ async def widget_websocket(
             data = await websocket.receive_json()
             
             body = data.get("body", "").strip()
+            # SECURITY: truncate massive texts to prevent token abuse
+            body = body[:1000] 
+            
             if not body:
                 continue
                 
@@ -162,6 +176,19 @@ async def widget_websocket(
                     session_id=session_id
                 )
                 ticket = await ticket_service.create_ticket(db, org_id, ticket_data)
+            
+            elif ticket.status == "resolved":
+                # Customer messaged again on a resolved ticket — re-open it!
+                # Reset: let AI handle fresh, clear assignment, preserve message history
+                ticket.status = "open"
+                ticket.needs_human = False
+                ticket.assigned_to = None
+                await db.commit()
+                await db.refresh(ticket)
+                # Clear the AI's old memory so it starts fresh
+                await redis.delete(f"langgraph_state:{session_id}")
+                # Notify the admin dashboard
+                await ticket_service.publish_event(redis, f"tickets:{org_id}", "ticket_updated", {"ticket_id": str(ticket.id)})
                 
             # 4. Save the customer's message into the database permanently.
             await ticket_service.add_message(
@@ -197,19 +224,40 @@ async def widget_websocket(
                 # We ask the AI graph to start generating the answer.
                 # Instead of waiting 5 seconds for the whole paragraph to finish, 
                 # we "stream" it letter-by-letter (tokens) so it feels super fast to the user!
+                resolve_buffer = ""  # Buffer to catch and suppress [RESOLVED] tag
                 async for event in support_graph.astream_events(state, version="v2"):
                     if event["event"] == "on_chat_model_stream":
                         token = event["data"]["chunk"].content # Grab the next word 
                         if token:
                             full_reply.append(token)
-                            # Shoot the word immediately down the pipe to the customer's screen
-                            await websocket.send_text(json.dumps({"type": "token", "content": token}))
+                            
+                            # Buffer tokens to detect and suppress [RESOLVED] tag
+                            resolve_buffer += token
+                            if "[RESOLVED]" in resolve_buffer:
+                                # Strip the tag and flush the clean part
+                                clean = resolve_buffer.replace("[RESOLVED]", "")
+                                if clean:
+                                    await websocket.send_text(json.dumps({"type": "token", "content": clean}))
+                                resolve_buffer = ""
+                            elif any("[RESOLVED]".startswith(resolve_buffer[-i:]) for i in range(1, len(resolve_buffer) + 1) if resolve_buffer[-i:] == "[RESOLVED]"[:i]):
+                                # Partial match — keep buffering
+                                pass
+                            else:
+                                # No match possible — flush and send
+                                await websocket.send_text(json.dumps({"type": "token", "content": resolve_buffer}))
+                                resolve_buffer = ""
                     elif event["event"] == "on_chain_end" and event["name"] == "LangGraph":
                         final_state = event["data"]["output"] # Save the final goldfish memory
 
+                # Flush any remaining buffer (strip [RESOLVED] if partially captured)
+                if resolve_buffer:
+                    leftover = resolve_buffer.replace("[RESOLVED]", "").strip()
+                    if leftover:
+                        await websocket.send_text(json.dumps({"type": "token", "content": leftover}))
+
                 # Process outcome: Let's see how the AI did.
                 if final_state.get("needs_escalation"):
-                    escalated_msg = "I'm connecting you with our support team now."
+                    escalated_msg = "I'm connecting you with our support team now. Please be patient as the agent may take a moment to respond."
                     
                     # The AI panicked and triggered an escalation
                     await websocket.send_text(json.dumps({
@@ -238,7 +286,23 @@ async def widget_websocket(
                 else:
                     # The AI answered successfully. Save the full reply in the DB permanently.
                     bot_reply = final_state.get("response", "".join(full_reply))
-                    await ticket_service.add_message(db, redis, ticket, "bot", bot_reply, session_id, skip_ws_publish=True)
+                    
+                    # Check if the AI detected customer satisfaction and tagged [RESOLVED]
+                    from agents.prompts import RESOLVE_INDICATOR
+                    should_resolve = RESOLVE_INDICATOR in bot_reply
+                    
+                    # Strip the hidden tag so the customer never sees it
+                    clean_reply = bot_reply.replace(RESOLVE_INDICATOR, "").strip()
+                    
+                    await ticket_service.add_message(db, redis, ticket, "bot", clean_reply, session_id, skip_ws_publish=True)
+                    
+                    # If the AI determined the customer is satisfied, auto-resolve the ticket
+                    if should_resolve:
+                        ticket.status = "resolved"
+                        # needs_human stays False → counts as "Resolved by AI" in analytics
+                        await db.commit()
+                        await db.refresh(ticket)
+                        await ticket_service.publish_event(redis, f"tickets:{org_id}", "ticket_updated", {"ticket_id": str(ticket.id)})
                 
                 # Save the new memory for next time
                 await save_state(redis, session_id, final_state)

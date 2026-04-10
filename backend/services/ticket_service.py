@@ -21,13 +21,12 @@ async def get_ticket_with_messages(db: AsyncSession, ticket_id: uuid.UUID) -> Ti
     return ticket
 
 async def get_ticket_by_session(db: AsyncSession, org_id: uuid.UUID, session_id: str) -> Ticket:
-    """Finds the most recent non-resolved ticket for a given session."""
+    """Finds the most recent ticket for a given session (including resolved ones)."""
     result = await db.execute(
         select(Ticket)
         .options(selectinload(Ticket.messages))
         .where(Ticket.org_id == org_id)
         .where(Ticket.session_id == session_id)
-        .where(Ticket.status != "resolved")
         .order_by(Ticket.created_at.desc())
     )
     return result.scalars().first()

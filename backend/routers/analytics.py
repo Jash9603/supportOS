@@ -280,7 +280,7 @@ async def _top_questions(db, org_id, since) -> list:
     import asyncio
     clusters = await asyncio.to_thread(cluster_questions, subjects, 8)
 
-    return [TopQuestion(question=c["question"], count=c["count"]) for c in clusters]
+    return [TopQuestion(question=c["question"], count=c["count"], summary=c.get("summary", "")) for c in clusters]
 
 
 async def _resolution_breakdown(db, org_id, since) -> ResolutionBreakdown:

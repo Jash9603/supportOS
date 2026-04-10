@@ -188,16 +188,37 @@ export default function AnalyticsPage() {
             {top_questions.length === 0 ? (
               <div style={s.emptyState}>No questions yet</div>
             ) : (
-              <ResponsiveContainer width="100%" height={220}>
-                <BarChart data={top_questions} layout="vertical" margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" horizontal={false} />
-                  <XAxis type="number" tick={{ fontSize: 11, fill: '#94A3B8' }} axisLine={false} tickLine={false} allowDecimals={false} />
-                  <YAxis dataKey="question" type="category" tick={{ fontSize: 11, fill: '#334155' }} width={140}
-                    tickFormatter={t => t.length > 22 ? t.slice(0, 22) + '…' : t} axisLine={false} tickLine={false} />
-                  <Tooltip contentStyle={tooltipStyle} />
-                  <Bar dataKey="count" fill={C.indigo} radius={[0, 6, 6, 0]} barSize={18} />
-                </BarChart>
-              </ResponsiveContainer>
+              <>
+                <ResponsiveContainer width="100%" height={220}>
+                  <BarChart data={top_questions} layout="vertical" margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" horizontal={false} />
+                    <XAxis type="number" tick={{ fontSize: 11, fill: '#94A3B8' }} axisLine={false} tickLine={false} allowDecimals={false} />
+                    <YAxis dataKey="question" type="category" tick={{ fontSize: 11, fill: '#334155' }} width={140}
+                      tickFormatter={t => t.length > 22 ? t.slice(0, 22) + '…' : t} axisLine={false} tickLine={false} />
+                    <Tooltip
+                      contentStyle={tooltipStyle}
+                      formatter={(value, name, props) => [value, 'Tickets']}
+                      labelFormatter={(label) => {
+                        const item = top_questions.find(q => q.question === label)
+                        return item?.summary || label
+                      }}
+                    />
+                    <Bar dataKey="count" fill={C.indigo} radius={[0, 6, 6, 0]} barSize={18} />
+                  </BarChart>
+                </ResponsiveContainer>
+                {/* Cluster Summaries */}
+                <div style={{ marginTop: 12, borderTop: '1px solid #E2E8F0', paddingTop: 10 }}>
+                  <p style={{ fontSize: '0.7rem', fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>
+                    Cluster Insights
+                  </p>
+                  {top_questions.filter(q => q.summary).slice(0, 5).map((q, i) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 4 }}>
+                      <span style={{ fontSize: '0.72rem', fontWeight: 700, color: C.indigo, minWidth: 20 }}>{q.count}x</span>
+                      <span style={{ fontSize: '0.78rem', color: '#334155' }}>{q.summary}</span>
+                    </div>
+                  ))}
+                </div>
+              </>
             )}
           </Card>
         </div>

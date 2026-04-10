@@ -7,11 +7,12 @@ import { useEffect, useRef, useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 
-function generateSessionId() {
-  const stored = localStorage.getItem('sos_session')
+function generateSessionId(orgId) {
+  const key = `sos_session_${orgId}`
+  const stored = localStorage.getItem(key)
   if (stored) return stored
   const id = crypto.randomUUID()
-  localStorage.setItem('sos_session', id)
+  localStorage.setItem(key, id)
   return id
 }
 
@@ -27,7 +28,7 @@ export default function WidgetChat() {
   const wsRef = useRef(null)
   const messagesEndRef = useRef(null)
   const reconnectTimer = useRef(null)
-  const sessionId = useRef(generateSessionId())
+  const sessionId = useRef(generateSessionId(orgId))
   const seenIds = useRef(new Set())        // Dedup guard: track message IDs we already rendered
   const cleanedUp = useRef(false)          // StrictMode guard: prevent double connection
 

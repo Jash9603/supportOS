@@ -233,6 +233,13 @@ body {
   transform: rotateY(180deg);
 }
 
+/* On touch/mobile devices, disable the hover flip (it gets stuck or ruins the UX) */
+@media (hover: none) and (pointer: coarse) {
+  .card-flip-outer:hover .card-flip-inner {
+    transform: none;
+  }
+}
+
 .card-face {
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
@@ -244,6 +251,35 @@ body {
   left: 0;
   width: 100%;
   transform: rotateY(180deg);
+}
+
+/* ── Rope Marquee Animation for Mobile ────────────────────────────────────── */
+@keyframes marqueeScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.rope-marquee-wrap {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  justify-content: space-around;
+}
+
+.mobile-only-marquee {
+  display: none; /* Hide duplicate cards on desktop */
+}
+
+@media (max-width: 768px) {
+  .rope-marquee-wrap {
+    width: max-content;
+    animation: marqueeScroll 20s linear infinite;
+  }
+  .mobile-only-marquee {
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+  }
 }
 
 /* ── Scroll-hint bounce ──────────────────────────────────────────────────────────── */

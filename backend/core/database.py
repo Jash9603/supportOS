@@ -24,8 +24,10 @@ from core.config import settings
 engine = create_async_engine(
     settings.DATABASE_URL,
     echo=False,           # set True to log all SQL queries for debugging
-    pool_size=5,
-    max_overflow=10,
+    pool_size=10,         # production size
+    max_overflow=20,
+    pool_timeout=30,      # Give up if can't get connection in 30s
+    pool_recycle=1800,    # Recycle connections every 30m to avoid stale drops
 )
 
 # Session factory — used in FastAPI route dependencies

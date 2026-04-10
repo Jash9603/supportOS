@@ -26,6 +26,8 @@ from core.database import get_db
 from core.security import create_access_token, verify_password, hash_password
 from dependencies import get_current_user
 from models.user import User
+from models.organisation import Organisation
+from pydantic import BaseModel
 from schemas.auth import LoginRequest, SignupRequest, UserResponse
 from services.auth_service import (
     create_org_and_user,
@@ -68,15 +70,18 @@ def _set_auth_cookie(response: Response, token: str) -> None:
 
 # ── Helper: build UserResponse from DB objects ────────────────────────────────
 
-def _build_user_response(user: User, org_name: str, org_slug: str) -> UserResponse:
+def _build_user_response(user: User, org: Organisation) -> UserResponse:
+    trial_str = org.trial_ends_at.isoformat() if org.trial_ends_at else None
     return UserResponse(
         id=user.id,
         email=user.email,
         name=user.name,
         role=user.role,
         org_id=user.org_id,
-        org_name=org_name,
-        org_slug=org_slug,
+        org_name=org.name,
+        org_slug=org.slug,
+        sub_status=org.sub_status,
+        trial_ends_at=trial_str,
     )
 
 
@@ -126,7 +131,7 @@ async def signup(
     _set_auth_cookie(response, token)
 
     # 5. Return user info
-    return _build_user_response(user, org.name, org.slug)
+    return _build_user_response(user, org)
 
 
 # ── POST /auth/login ──────────────────────────────────────────────────────────
@@ -173,7 +178,7 @@ async def login(
     })
     _set_auth_cookie(response, token)
 
-    return _build_user_response(user, org.name, org.slug)
+    return _build_user_response(user, org)
 
 
 # ── POST /auth/logout ─────────────────────────────────────────────────────────
@@ -204,4 +209,28 @@ async def me(
     Frontend calls this on page load to check if session is still valid.
     """
     org = await get_org_by_id(db, current_user.org_id)
-    return _build_user_response(current_user, org.name, org.slug)
+    return _build_user_response(current_user, org)
+class ActivateSubRequest(BaseModel):
+    subscription_id: str
+
+@router.post("/activate-subscription")
+async def activate_subscription(
+    body: ActivateSubRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Called by frontend after PayPal approval.
+    Saves the subscription ID and marks the org as 'active'.
+    """
+    from sqlalchemy import update
+    await db.execute(
+        update(Organisation)
+        .where(Organisation.id == current_user.org_id)
+        .values(
+            paypal_sub_id=body.subscription_id,
+            sub_status="active"
+        )
+    )
+    await db.commit()
+    return {"message": "Subscription activated successfully"}

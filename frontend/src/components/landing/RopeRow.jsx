@@ -43,7 +43,7 @@ export default function RopeRow({ tickets }) {
         />
       </svg>
 
-      {/* Cards evenly distributed below the rope */}
+      {/* Cards evenly distributed below the rope. Wrapped in marquee class for mobile. */}
       <div
         style={{
           display: 'flex',
@@ -51,11 +51,22 @@ export default function RopeRow({ tickets }) {
           alignItems: 'flex-start',
           padding: '4px 5% 0',
           height: '100%',
+          overflow: 'hidden', // hides the scrolling duplicate on mobile
+          width: '100%',
         }}
       >
-        {tickets.map((ticket, i) => (
-          <HangingCard key={i} {...ticket} />
-        ))}
+        <div className="rope-marquee-wrap">
+          {/* Original set */}
+          {tickets.map((ticket, i) => (
+            <HangingCard key={`orig-${i}`} {...ticket} />
+          ))}
+          {/* Duplicated set for seamless marquee loop on mobile */}
+          <div className="mobile-only-marquee">
+             {tickets.map((ticket, i) => (
+              <HangingCard key={`dup-${i}`} {...ticket} />
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   )

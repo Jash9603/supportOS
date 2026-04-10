@@ -31,7 +31,7 @@
 # LANGSMITH TRACING:
 #   Every node execution, LLM call, and state transition is automatically
 #   traced because we set LANGCHAIN_TRACING_V2=true in agents/__init__.py.
-#   View traces at: https://smith.langchain.com → project "supportos-mvp"
+#   View traces at: https://smith.langchain.com → project "supportos-prod"
 # -----------------------------------------------------------------------------
 
 from langgraph.graph import StateGraph, END
@@ -156,11 +156,12 @@ async def responder_node(state: SupportState) -> dict:
 
     answer = result.content
 
-    # Detect fallback — if the bot said "I don't know", count it as a failure
+    # Detect fallback — if the bot said "I don't know", escalate immediately
     if FALLBACK_INDICATOR.lower() in answer.lower():
         return {
             "response": answer,
             "bot_failure_count": state["bot_failure_count"] + 1,
+            "needs_escalation": True,  # Auto-escalate on first failure
         }
 
     # Success — reset failure counter

@@ -6,6 +6,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, Outlet } from 'react-router-dom'
 import { authApi } from '../lib/api'
+import BillingGate from './BillingGate'
 
 export default function ProtectedRoute() {
   const navigate = useNavigate()
@@ -27,6 +28,11 @@ export default function ProtectedRoute() {
         <p style={{ fontFamily: 'Inter, sans-serif', color: '#4A4743' }}>Loading…</p>
       </div>
     )
+  }
+
+  // Enforce Subscription Wall
+  if (user && user.sub_status === 'inactive') {
+    return <BillingGate user={user} />
   }
 
   return <Outlet context={{ user }} />

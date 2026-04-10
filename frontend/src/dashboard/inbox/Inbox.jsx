@@ -29,6 +29,7 @@ import useInboxSocket from '../../lib/hooks/useInboxSocket'
 export default function Inbox({ user }) {
   // ── State ─────────────────────────────────────────────────────────────
   const [tickets, setTickets] = useState([])
+  const [allTickets, setAllTickets] = useState([])  // For accurate counter badges
   const [selectedTicket, setSelectedTicket] = useState(null)
   const [messages, setMessages] = useState([])
   const [replyText, setReplyText] = useState('')
@@ -40,13 +41,26 @@ export default function Inbox({ user }) {
   // Real-time hook — fires whenever a new ticket/message event comes in
   const { lastEvent } = useInboxSocket(user?.org_id)
 
-  // ── Fetch ticket list ─────────────────────────────────────────────────
+  // ── Fetch ALL tickets (for counter badges) ────────────────────────────
+  const fetchAllCounts = useCallback(async () => {
+    try {
+      const res = await api.get('/tickets')
+      setAllTickets(res.data)
+    } catch (err) {
+      console.error('Failed to fetch all tickets:', err)
+    }
+  }, [])
+
+  // ── Fetch ticket list (filtered view) ─────────────────────────────────
   const fetchTickets = useCallback(async () => {
     try {
       const params = {}
       if (filter === 'open') params.status = 'open'
       if (filter === 'resolved') params.status = 'resolved'
-      if (filter === 'mine') params.assigned_to = user?.id
+      if (filter === 'mine') {
+        params.assigned_to = user?.id
+        params.status = 'open'  // Only show open tickets assigned to me
+      }
 
       const res = await api.get('/tickets', { params })
       setTickets(res.data)
@@ -60,12 +74,14 @@ export default function Inbox({ user }) {
   // Fetch on mount + when filter changes
   useEffect(() => {
     fetchTickets()
-  }, [fetchTickets])
+    fetchAllCounts()
+  }, [fetchTickets, fetchAllCounts])
 
   // Re-fetch when a real-time event fires (new ticket, new message, etc.)
   useEffect(() => {
     if (lastEvent) {
       fetchTickets()
+      fetchAllCounts()
       // If we're viewing a ticket that got a new message, refresh it too
       if (selectedTicket && lastEvent.ticket_id === String(selectedTicket.id)) {
         fetchTicketDetail(selectedTicket.id)
@@ -162,9 +178,9 @@ export default function Inbox({ user }) {
         <h3 style={styles.filterTitle}>Views</h3>
 
         {[
-          { key: 'open', label: 'All Open', count: tickets.filter(t => t.status === 'open').length },
-          { key: 'mine', label: 'Assigned to me', count: tickets.filter(t => String(t.assigned_to) === String(user?.id)).length },
-          { key: 'resolved', label: 'Resolved', count: null },
+          { key: 'open', label: 'All Open', count: allTickets.filter(t => t.status !== 'resolved').length },
+          { key: 'mine', label: 'Assigned to me', count: allTickets.filter(t => String(t.assigned_to) === String(user?.id) && t.status !== 'resolved').length },
+          { key: 'resolved', label: 'Resolved', count: allTickets.filter(t => t.status === 'resolved').length },
         ].map((f) => (
           <button
             key={f.key}
