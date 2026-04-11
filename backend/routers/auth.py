@@ -62,8 +62,8 @@ def _set_auth_cookie(response: Response, token: str) -> None:
         key="access_token",
         value=token,
         httponly=True,       # JS cannot read this cookie — XSS safe
-        secure=False,        # Set True in production (requires HTTPS)
-        samesite="lax",      # Sent on same-site + top-level nav — CSRF protection
+        secure=True,         # Required for cross-site cookies
+        samesite="none",     # Required for cross-origin (Frontend apart from Backend)
         max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
     )
 
@@ -192,7 +192,8 @@ async def logout(response: Response):
     response.delete_cookie(
         key="access_token",
         httponly=True,
-        samesite="lax",
+        secure=True,
+        samesite="none",
     )
 
 
