@@ -43,7 +43,6 @@ from models.kb_document import KbDocument
 from models.organisation import Organisation
 from schemas.chatbot import KbDocumentResponse, ChatbotToggle, ChatbotTestRequest
 from services import rag_service
-from workers.tasks import ingest_document
 
 router = APIRouter()
 
@@ -61,8 +60,7 @@ async def upload_document(
 ):
     """
     Upload a PDF or .txt file to the org's knowledge base.
-    Returns immediately with status="processing".
-    A background Celery worker handles the actual embedding.
+    Processes the document inline (no Celery worker needed).
     """
     # Validate file type
     allowed_extensions = {".pdf", ".txt"}
@@ -94,12 +92,88 @@ async def upload_document(
     await db.commit()
     await db.refresh(kb_doc)
 
-    # Dispatch background task — Celery will read, chunk, embed, and store
-    ingest_document.delay(
-        str(current_user.org_id),
-        str(doc_id),
-        file_path,
-    )
+    # ── Process inline instead of Celery ──────────────────────
+    try:
+        from core.config import settings
+        
+        # Read the file
+        if file_path.endswith(".pdf"):
+            from pypdf import PdfReader
+            reader = PdfReader(file_path)
+            text = "\n".join(page.extract_text() or "" for page in reader.pages)
+        else:
+            with open(file_path, "r", encoding="utf-8") as f:
+                text = f.read()
+
+        if not text.strip():
+            kb_doc.status = "failed"
+            await db.commit()
+            return kb_doc
+
+        # Chunk the text (~512 words, 50 word overlap)
+        words = text.split()
+        chunk_size = 512
+        overlap = 50
+        chunks = []
+        for i in range(0, len(words), chunk_size - overlap):
+            chunk = " ".join(words[i:i + chunk_size])
+            if chunk.strip():
+                chunks.append(chunk)
+
+        # Generate embeddings via OpenAI
+        from openai import OpenAI
+        openai_client = OpenAI(api_key=settings.OPENAI_API_KEY)
+        response = openai_client.embeddings.create(
+            model="text-embedding-3-small",
+            input=chunks
+        )
+        embeddings = [item.embedding for item in response.data]
+
+        # Store in Qdrant
+        from qdrant_client import QdrantClient
+        from qdrant_client.models import VectorParams, Distance, PointStruct
+
+        qdrant = QdrantClient(
+            url=settings.QDRANT_URL,
+            api_key=settings.QDRANT_API_KEY or None,
+        )
+
+        collection_name = f"org_{current_user.org_id}_kb"
+
+        if not qdrant.collection_exists(collection_name):
+            qdrant.create_collection(
+                collection_name=collection_name,
+                vectors_config=VectorParams(size=1536, distance=Distance.COSINE),
+            )
+
+        points = [
+            PointStruct(
+                id=str(uuid.uuid5(uuid.NAMESPACE_DNS, f"{doc_id}_{i}")),
+                vector=embeddings[i],
+                payload={"doc_id": str(doc_id), "chunk_index": i, "text": chunks[i]},
+            )
+            for i in range(len(chunks))
+        ]
+
+        qdrant.upsert(collection_name=collection_name, points=points)
+
+        # Update status
+        kb_doc.status = "indexed"
+        kb_doc.chunk_count = len(chunks)
+        await db.commit()
+        await db.refresh(kb_doc)
+
+        # Cleanup temp file
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
+        print(f"[upload] ✓ {file.filename} → {len(chunks)} chunks indexed")
+
+    except Exception as exc:
+        print(f"[upload] ✗ Failed: {exc}")
+        kb_doc.status = "failed"
+        await db.commit()
+        await db.refresh(kb_doc)
 
     return kb_doc
 
