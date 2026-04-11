@@ -50,7 +50,7 @@ Step 5: Your kitchen gets the order (Ticket created in Postgres)
 (function () {
   var script = document.currentScript;
   var orgId = window.SUPPORT_OS_ORG_ID || (script ? script.getAttribute("data-org-id") : null);
-  var frontendUrl = window.SUPPORT_OS_FRONTEND_URL || (script ? script.getAttribute("data-frontend-url") : null) || "http://localhost:5173";
+  var frontendUrl = window.SUPPORT_OS_FRONTEND_URL || (script ? script.getAttribute("data-frontend-url") : null) || "https://support-os-omega.vercel.app";
   var userId = window.SUPPORT_OS_USER_ID || "default";
 
   if (!orgId) {
