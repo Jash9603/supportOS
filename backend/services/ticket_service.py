@@ -1,4 +1,5 @@
 import json
+import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
@@ -7,6 +8,7 @@ import uuid
 
 from models.ticket import Ticket
 from models.message import Message
+from models.notification import Notification
 from schemas.ticket import TicketCreate, TicketUpdate
 
 async def get_ticket_with_messages(db: AsyncSession, ticket_id: uuid.UUID) -> Ticket:
@@ -80,7 +82,47 @@ async def publish_event(redis_client, channel: str, event_type: str, payload: di
     # To avoid Pydantic/UUID serialization issues, ensure payload dict is stringified safely elsewhere or here
     await redis_client.publish(channel, json.dumps(msg, default=str))
 
-import datetime
+
+# ══════════════════════════════════════════════════════════════════════════════
+# NOTIFICATION HELPERS
+# ══════════════════════════════════════════════════════════════════════════════
+
+async def create_notification(
+    db: AsyncSession,
+    redis_client,
+    org_id: uuid.UUID,
+    notif_type: str,
+    title: str,
+    body: str = None,
+    ticket_id: uuid.UUID = None,
+):
+    """
+    Create a persistent notification in the DB and publish it via Redis
+    so the dashboard receives it in real-time.
+    """
+    notif = Notification(
+        org_id=org_id,
+        type=notif_type,
+        title=title,
+        body=body,
+        ticket_id=ticket_id,
+    )
+    db.add(notif)
+    await db.commit()
+    await db.refresh(notif)
+
+    # Push to the org's dashboard channel so the bell icon updates instantly
+    await publish_event(redis_client, f"tickets:{org_id}", "notification", {
+        "id": str(notif.id),
+        "notif_type": notif_type,
+        "title": title,
+        "body": body or "",
+        "ticket_id": str(ticket_id) if ticket_id else None,
+        "created_at": notif.created_at.isoformat(),
+    })
+
+    return notif
+
 
 async def add_message(db: AsyncSession, redis_client, ticket: Ticket, sender_type: str, body: str, sender_id: str = None, skip_ws_publish: bool = False) -> Message:
     new_message = Message(
@@ -110,5 +152,17 @@ async def add_message(db: AsyncSession, redis_client, ticket: Ticket, sender_typ
         "ticket_id": str(ticket.id),
         "message_id": str(new_message.id)
     })
+
+    # 3. Create a notification for customer messages (not bot/agent replies)
+    if sender_type == "user":
+        truncated_body = (body[:80] + "…") if len(body) > 80 else body
+        await create_notification(
+            db, redis_client,
+            org_id=ticket.org_id,
+            notif_type="new_message",
+            title=f"New message on: {ticket.subject[:60]}",
+            body=truncated_body,
+            ticket_id=ticket.id,
+        )
     
     return new_message

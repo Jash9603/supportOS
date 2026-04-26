@@ -42,5 +42,6 @@ class UserResponse(BaseModel):
     org_slug: str
     sub_status: str
     trial_ends_at: str | None = None
+    subscription_ends_at: str | None = None
 
     model_config = {"from_attributes": True}  # allows building from SQLAlchemy model objects

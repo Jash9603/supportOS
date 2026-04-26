@@ -176,6 +176,14 @@ async def widget_websocket(
                     session_id=session_id
                 )
                 ticket = await ticket_service.create_ticket(db, org_id, ticket_data)
+                # 🔔 Notify dashboard: new ticket created
+                await ticket_service.create_notification(
+                    db, redis, org_id=org_id,
+                    notif_type="new_ticket",
+                    title=f"New ticket from {ticket_data.requester_name}",
+                    body=subject,
+                    ticket_id=ticket.id,
+                )
             
             elif ticket.status == "resolved":
                 # Customer messaged again on a resolved ticket — re-open it!
@@ -280,6 +288,15 @@ async def widget_websocket(
                     
                     # Ring the bell in the Admin's inbox to notify them that a human is needed!
                     await ticket_service.publish_event(redis, f"tickets:{org_id}", "ticket_updated", {"ticket_id": str(ticket.id)})
+                    
+                    # 🔔 Notify dashboard: escalation alert
+                    await ticket_service.create_notification(
+                        db, redis, org_id=org_id,
+                        notif_type="escalation",
+                        title=f"⚠️ Escalation: {ticket.subject[:60]}",
+                        body=f"{ticket.requester_name} needs human help",
+                        ticket_id=ticket.id,
+                    )
                     
                     # Save the message permanently so it's visible on refresh and to the human agent
                     await ticket_service.add_message(db, redis, ticket, "bot", escalated_msg, session_id, skip_ws_publish=True)

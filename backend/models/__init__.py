@@ -16,5 +16,6 @@ from models.user import User
 from models.ticket import Ticket
 from models.message import Message
 from models.kb_document import KbDocument
+from models.notification import Notification
 
-__all__ = ["Organisation", "User", "Ticket", "Message", "KbDocument"]
+__all__ = ["Organisation", "User", "Ticket", "Message", "KbDocument", "Notification"]

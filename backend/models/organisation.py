@@ -43,6 +43,7 @@ class Organisation(Base):
     paypal_sub_id: Mapped[str] = mapped_column(String(255), nullable=True)
     sub_status: Mapped[str] = mapped_column(String(50), default="inactive", nullable=False)
     trial_ends_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
+    subscription_ends_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
     
     onboarding_completed: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     created_at: Mapped[datetime] = mapped_column(

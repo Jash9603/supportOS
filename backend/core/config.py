@@ -32,15 +32,29 @@ class Settings(BaseSettings):
     AUTH_SECRET: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440
 
+    # Deployment URLs
+    FRONTEND_URL: str = "http://localhost:5173"
+    BACKEND_URL: str = "http://localhost:8000"
+
     # CORS — comma-separated origins
-    ALLOWED_ORIGINS: str = "http://localhost:5173"
+    ALLOWED_ORIGINS: str = "http://localhost:5173,https://support-os-omega.vercel.app"
 
     # LangSmith (optional)
     LANGSMITH_API_KEY: str = ""
     LANGSMITH_PROJECT: str = "supportos-prod"
 
-    # Lemon Squeezy
-    LEMON_SQUEEZY_WEBHOOK_SECRET: str = ""
+    # Dodo Payments
+    DODO_API_KEY: str = ""
+    DODO_WEBHOOK_SECRET: str = ""
+    DODO_MONTHLY_PRODUCT_ID: str = ""
+    DODO_YEARLY_PRODUCT_ID: str = ""
+
+    # Contact / SMTP
+    CONTACT_EMAIL: str = "jashkevdiya@gmail.com"
+    SMTP_HOST: str = "smtp.gmail.com"
+    SMTP_PORT: int = 587
+    SMTP_USER: str = ""
+    SMTP_PASS: str = ""
 
     @property
     def origins_list(self) -> list[str]:

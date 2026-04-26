@@ -72,6 +72,7 @@ def _set_auth_cookie(response: Response, token: str) -> None:
 
 def _build_user_response(user: User, org: Organisation) -> UserResponse:
     trial_str = org.trial_ends_at.isoformat() if org.trial_ends_at else None
+    sub_ends_str = org.subscription_ends_at.isoformat() if org.subscription_ends_at else None
     return UserResponse(
         id=user.id,
         email=user.email,
@@ -82,6 +83,7 @@ def _build_user_response(user: User, org: Organisation) -> UserResponse:
         org_slug=org.slug,
         sub_status=org.sub_status,
         trial_ends_at=trial_str,
+        subscription_ends_at=sub_ends_str,
     )
 
 

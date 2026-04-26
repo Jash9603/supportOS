@@ -269,16 +269,35 @@ async def _batch_score_sentiment(db, org_id, since):
 
 
 async def _top_questions(db, org_id, since) -> list:
-    """Cluster ticket subjects using embeddings."""
+    """Cluster tickets by content similarity using embeddings + LLM summaries."""
+    # Fetch tickets with their first user message for deeper understanding
     result = await db.execute(
-        select(Ticket.subject)
+        select(Ticket.id, Ticket.subject)
         .where(Ticket.org_id == org_id, Ticket.created_at >= since)
     )
-    subjects = [r[0] for r in result.all()]
+    tickets = result.all()
+
+    if not tickets:
+        return []
+
+    # For each ticket, get the first user message (the actual complaint)
+    ticket_data = []
+    for ticket_id, subject in tickets:
+        msg_result = await db.execute(
+            select(Message.body)
+            .where(Message.ticket_id == ticket_id, Message.sender_type == "user")
+            .order_by(Message.created_at)
+            .limit(1)
+        )
+        first_msg = msg_result.scalar()
+        ticket_data.append({
+            "subject": subject or "",
+            "content": first_msg or subject or "",
+        })
 
     from services.clustering_service import cluster_questions
     import asyncio
-    clusters = await asyncio.to_thread(cluster_questions, subjects, 8)
+    clusters = await asyncio.to_thread(cluster_questions, ticket_data, 8)
 
     return [TopQuestion(question=c["question"], count=c["count"], summary=c.get("summary", "")) for c in clusters]
 

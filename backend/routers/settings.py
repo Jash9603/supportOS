@@ -40,6 +40,9 @@ async def update_profile(
         org_id=current_user.org_id,
         org_name=org.name,
         org_slug=org.slug,
+        sub_status=org.sub_status if hasattr(org, 'sub_status') else 'trial',
+        trial_ends_at=str(org.trial_ends_at) if hasattr(org, 'trial_ends_at') and org.trial_ends_at else None,
+        subscription_ends_at=str(org.subscription_ends_at) if hasattr(org, 'subscription_ends_at') and org.subscription_ends_at else None,
     )
 
 
@@ -77,4 +80,7 @@ async def update_org(
         org_id=current_user.org_id,
         org_name=org.name,
         org_slug=org.slug,
+        sub_status=org.sub_status if hasattr(org, 'sub_status') else 'trial',
+        trial_ends_at=str(org.trial_ends_at) if hasattr(org, 'trial_ends_at') and org.trial_ends_at else None,
+        subscription_ends_at=str(org.subscription_ends_at) if hasattr(org, 'subscription_ends_at') and org.subscription_ends_at else None,
     )

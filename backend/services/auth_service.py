@@ -100,6 +100,7 @@ async def create_org_and_user(
         name=org_name.strip(),
         slug=slug,
         plan="free",
+        sub_status="inactive", # Lock out immediately
         chatbot_enabled=False,
         chatbot_config={},
         onboarding_completed=False,

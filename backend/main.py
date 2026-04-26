@@ -33,6 +33,8 @@ from routers import chatbot       # Piece 3.1
 from routers import analytics     # Piece 4.1
 from routers import settings as settings_router # Settings
 from routers import billing
+from routers import contact
+from routers import notifications
 
 
 # ── Lifespan (startup / shutdown) ────────────────────
@@ -74,6 +76,8 @@ app.include_router(chatbot.router,   prefix="/chatbot",   tags=["Chatbot"])
 app.include_router(analytics.router, prefix="/analytics", tags=["Analytics"])
 app.include_router(settings_router.router,  prefix="/settings",  tags=["Settings"])
 app.include_router(billing.router, prefix="/billing", tags=["Billing"])
+app.include_router(contact.router, prefix="/contact", tags=["Contact"])
+app.include_router(notifications.router, prefix="/notifications", tags=["Notifications"])
 
 
 # ── Health check ──────────────────────────────────────
