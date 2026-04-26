@@ -10,8 +10,7 @@ __pycache__/
 venv/
 ENV/
 
-# Alembic
-backend/migrations/versions/*.pyc
+
 
 # Node / Frontend
 node_modules/
@@ -43,3 +42,11 @@ backend/cookies.txt
 backend/test_*.json
 
 test_customer_site.html
+
+backend/seed_tickets.py
+
+backend/uploads/
+backend/static/
+*.mp4
+*.pdf
+.env
