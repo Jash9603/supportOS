@@ -61,12 +61,14 @@ export default function SettingsPage() {
     }
   }
 
+  const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+
   // Generate the actual snippet based on the org ID
   const scriptSnippet = `<script>
   window.SUPPORT_OS_ORG_ID = "${user?.org_id || 'YOUR_ORG_ID'}";
   window.SUPPORT_OS_USER_ID = "default"; // Optional: pass your user's primary key here
 </script>
-<script src="http://localhost:8000/static/widget.js" async></script>`
+<script src="${backendUrl}/static/widget.js" async></script>`
 
   const reactSnippet = `import { useEffect } from 'react';
 
@@ -75,7 +77,7 @@ export default function App() {
     window.SUPPORT_OS_ORG_ID = "${user?.org_id || 'YOUR_ORG_ID'}";
     window.SUPPORT_OS_USER_ID = "default"; // Optional: pass your user's primary key here
     const script = document.createElement('script');
-    script.src = "http://localhost:8000/static/widget.js";
+    script.src = "${backendUrl}/static/widget.js";
     script.async = true;
     document.body.appendChild(script);
     
@@ -98,7 +100,7 @@ export default function RootLayout({ children }) {
             window.SUPPORT_OS_USER_ID = "default"; // Optional: pass your user's primary key here
           \`
         }} />
-        <Script src="http://localhost:8000/static/widget.js" strategy="lazyOnload" />
+        <Script src="${backendUrl}/static/widget.js" strategy="lazyOnload" />
       </body>
     </html>
   );
@@ -115,8 +117,25 @@ export default function RootLayout({ children }) {
 
   if (!user) return null
 
+  let planDisplay = "Inactive"
+  if (user.sub_status === 'active') {
+    if (user.subscription_ends_at) {
+      planDisplay = `Active (Ends: ${new Date(user.subscription_ends_at).toLocaleDateString()})`
+    } else if (user.trial_ends_at) {
+      planDisplay = `Free Trial (Ends: ${new Date(user.trial_ends_at).toLocaleDateString()})`
+    } else {
+      planDisplay = "Active"
+    }
+  } else {
+    if (user.subscription_ends_at && new Date(user.subscription_ends_at) < new Date()) {
+       planDisplay = `Expired (${new Date(user.subscription_ends_at).toLocaleDateString()})`
+    } else if (user.trial_ends_at && new Date(user.trial_ends_at) < new Date()) {
+       planDisplay = `Trial Expired (${new Date(user.trial_ends_at).toLocaleDateString()})`
+    }
+  }
+
   return (
-    <div style={s.page}>
+    <div className="settings-page" style={s.page}>
 
       {/* ── Profile Settings ── */}
       <section style={s.section}>
@@ -182,7 +201,7 @@ export default function RootLayout({ children }) {
             </div>
             <div style={s.formGroup}>
               <label style={s.label}>Current Plan</label>
-              <input type="text" style={s.inputDisabled} value="Free Trial" disabled />
+              <input type="text" style={s.inputDisabled} value={planDisplay} disabled />
             </div>
           </div>
           <div style={s.cardFooter}>
@@ -195,6 +214,23 @@ export default function RootLayout({ children }) {
             )}
           </div>
         </form>
+      </section>
+
+      {/* ── Support ── */}
+      <section style={s.section}>
+        <h2 style={s.sectionTitle}>Support</h2>
+        <p style={s.sectionSub}>Need help with your plan or technical integration?</p>
+        <div style={{...s.card, display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+          <div>
+            <h4 style={{ margin: '0 0 4px', color: '#0F172A', fontSize: '0.95rem' }}>Direct Support</h4>
+            <p style={{ margin: 0, color: '#64748B', fontSize: '0.85rem' }}>
+              We're here to help. Contact us directly for priority support.
+            </p>
+          </div>
+          <a href="mailto:support@supportos.com" style={s.btnSecondary}>
+            support@supportos.com
+          </a>
+        </div>
       </section>
 
 
@@ -333,6 +369,18 @@ const s = {
     fontWeight: 500,
     cursor: 'pointer',
     transition: 'opacity 0.2s',
+  },
+  btnSecondary: {
+    padding: '8px 20px',
+    background: '#F1F5F9',
+    color: '#0F172A',
+    border: '1px solid #E2E8F0',
+    borderRadius: 8,
+    fontSize: '0.9rem',
+    fontWeight: 600,
+    cursor: 'pointer',
+    textDecoration: 'none',
+    transition: 'background 0.2s',
   },
 
   // Widget Tab Styles

@@ -157,6 +157,13 @@ body {
   max-width: 420px;
 }
 
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 28px 20px;
+    border-radius: 8px;
+  }
+}
+
 /* ── Speech bubbles ───────────────────────────────────────────────────────── */
 .speech-bubble {
   position: absolute;
@@ -253,10 +260,30 @@ body {
   transform: rotateY(180deg);
 }
 
+/* ── Spin animation (contact form loader) ────────────────────────────────── */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes notifSlideIn {
+  from { opacity: 0; transform: translateY(-10px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* ── Rope Marquee Animation for Mobile ────────────────────────────────────── */
 @keyframes marqueeScroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 .rope-marquee-wrap {
@@ -267,18 +294,55 @@ body {
 }
 
 .mobile-only-marquee {
-  display: none; /* Hide duplicate cards on desktop */
+  display: none;
+  /* Hide duplicate cards on desktop */
 }
 
 @media (max-width: 768px) {
   .rope-marquee-wrap {
     width: max-content;
     animation: marqueeScroll 20s linear infinite;
+    gap: 32px;
+    padding-right: 32px;
   }
+
+  .rope-marquee-wrap>* {
+    flex-shrink: 0;
+  }
+
   .mobile-only-marquee {
     display: flex;
-    width: 100%;
-    justify-content: space-around;
+    width: max-content;
+    gap: 32px;
+  }
+
+  /* Smooth fade at left/right edges so cards + pins + strings
+     disappear gradually instead of being clipped abruptly */
+  .rope-cards-container {
+    padding: 4px 0 8px !important;
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      black 12%,
+      black 88%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      black 12%,
+      black 88%,
+      transparent 100%
+    );
+  }
+
+  /* Give the ropes section more height on mobile so cards aren't clipped */
+  .ropes-section {
+    height: auto !important;
+    min-height: 100vh;
+    padding-top: 40px !important;
+    padding-bottom: 24px !important;
+    gap: 24px !important;
   }
 }
 
@@ -305,4 +369,380 @@ body {
   align-items: center;
   gap: 6px;
   animation: scrollBounce 2.2s ease-in-out infinite;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════════════
+   DASHBOARD SHELL: Sidebar, Top Bar, Hamburger Menu
+   ═══════════════════════════════════════════════════════════════════════════════════ */
+
+.dashboard-shell {
+  display: flex;
+  height: 100vh;
+  background: #F8FAFC;
+  font-family: Inter, system-ui, sans-serif;
+}
+
+.dashboard-sidebar {
+  width: 240px;
+  background: #0F172A;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  border-right: 1px solid #1E293B;
+}
+
+.dashboard-topbar {
+  height: 60px;
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #FFFFFF;
+  border-bottom: 1px solid #E2E8F0;
+  flex-shrink: 0;
+}
+
+/* Hamburger button — hidden on desktop */
+.hamburger-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: #0F172A;
+  cursor: pointer;
+  padding: 4px;
+  align-items: center;
+}
+
+/* Sidebar close button — hidden on desktop */
+.sidebar-close-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: #94A3B8;
+  cursor: pointer;
+  padding: 4px;
+  align-items: center;
+}
+
+/* Sidebar overlay — hidden on desktop */
+.sidebar-overlay {
+  display: none;
+}
+
+/* ── Landing Navbar mobile toggle — hidden on desktop ─────────────────────── */
+.navbar-mobile-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: #0D0D0B;
+  cursor: pointer;
+  padding: 4px;
+  align-items: center;
+}
+
+.navbar-mobile-menu {
+  display: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════════
+   MOBILE BREAKPOINT: < 768px
+   ═══════════════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+
+  /* ── Dashboard sidebar: off-canvas drawer ─── */
+  .dashboard-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 1000;
+    width: 260px;
+    transform: translateX(-100%);
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: none;
+  }
+
+  .dashboard-sidebar.open {
+    transform: translateX(0);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.25);
+  }
+
+  .sidebar-overlay {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 999;
+    animation: fadeIn 0.2s ease;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* Show hamburger + close buttons on mobile */
+  .hamburger-btn {
+    display: flex;
+    margin-right: 12px;
+  }
+
+  .sidebar-close-btn {
+    display: flex;
+  }
+
+  /* Top bar: narrower padding for mobile */
+  .dashboard-topbar {
+    padding: 0 16px;
+    height: 54px;
+  }
+
+  /* ── Landing page: Rope cards marquee padding fix ─── */
+  .rope-marquee-wrap {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  /* ── Hide scroll hint on mobile ── */
+  .scroll-hint {
+    display: none;
+  }
+
+  /* ── Landing Navbar: hamburger toggle ─── */
+  .navbar-desktop-links {
+    display: none !important;
+  }
+
+  .navbar-mobile-toggle {
+    display: flex !important;
+  }
+
+  .navbar-mobile-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #F5F0E8;
+    border-bottom: 1.5px solid #D4CFC4;
+    padding: 16px 5%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 100;
+    animation: fadeInUp 0.25s ease;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════════════
+   MOBILE OVERRIDES FOR DASHBOARD PAGES (via class-based selectors)
+   These use custom CSS classes added to the page containers.
+   Since inline styles can't handle media queries, we use !important selectively.
+   ═══════════════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  /* ── General page containers (Overview, Analytics, Chatbot, Settings) ─── */
+
+  /* Auth card mobile */
+  .auth-card {
+    max-width: 100% !important;
+    margin: 0 16px;
+  }
+
+  /* ── Overview page ─── */
+  .overview-container {
+    padding: 20px 16px !important;
+  }
+
+  .overview-header {
+    flex-direction: column !important;
+    gap: 12px !important;
+    align-items: flex-start !important;
+  }
+
+  .overview-kpi-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px !important;
+  }
+
+  .overview-bottom-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  /* ── Analytics page ─── */
+  .analytics-page {
+    padding: 20px 16px !important;
+  }
+
+  .analytics-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+
+  .analytics-grid2 {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .analytics-grid3 {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .analytics-loading-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .analytics-card {
+    padding: 14px !important;
+  }
+
+  /* ── Chatbot page ─── */
+  .chatbot-container {
+    padding: 20px 16px !important;
+  }
+
+  .chatbot-header {
+    flex-direction: column !important;
+    gap: 12px !important;
+    align-items: flex-start !important;
+  }
+
+  .chatbot-grid {
+    grid-template-columns: 1fr !important;
+    height: auto !important;
+    min-height: auto !important;
+  }
+
+  .chatbot-grid>div {
+    max-height: 60vh;
+  }
+
+  /* ── Settings page ─── */
+  .settings-page {
+    padding: 20px 16px !important;
+  }
+
+  /* ── Inbox page: Collapse 3-panel into stacked ─── */
+  .inbox-container {
+    flex-direction: column !important;
+    height: auto !important;
+  }
+
+  .inbox-filter-panel {
+    width: 100% !important;
+    border-right: none !important;
+    border-bottom: 1px solid #E2E8F0;
+    padding: 12px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .inbox-filter-panel h3 {
+    display: none;
+  }
+
+  .inbox-filter-panel button {
+    padding: 6px 10px !important;
+    font-size: 0.78rem !important;
+  }
+
+  .inbox-filter-panel>div:last-child {
+    width: 100%;
+    margin-top: 4px !important;
+  }
+
+  .inbox-list-panel {
+    width: 100% !important;
+    max-height: 35vh;
+    border-right: none !important;
+    border-bottom: 1px solid #E2E8F0;
+  }
+
+  .inbox-detail-panel {
+    min-height: 50vh;
+  }
+
+  .inbox-reply-bar {
+    padding: 12px 16px !important;
+  }
+
+  .inbox-reply-actions button {
+    font-size: 0.78rem !important;
+    padding: 6px 14px !important;
+  }
+
+  /* ── Billing Gate ─── */
+  .billing-overlay {
+    padding: 16px !important;
+    align-items: flex-start !important;
+    padding-top: 40px !important;
+  }
+
+  .billing-card {
+    padding: 24px 16px !important;
+    max-width: 100% !important;
+  }
+
+  .billing-plans {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  /* ── Landing page RopesSection: more side padding ─── */
+  .ropes-section {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  /* ── Contact section: stack to single column ─── */
+  .contact-section-grid {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+  }
+
+  /* ── Notification Panel ─── */
+  .notification-panel {
+    position: fixed !important;
+    top: 70px !important;
+    right: 16px !important;
+    left: 16px !important;
+    width: auto !important;
+    max-height: calc(100vh - 90px) !important;
+  }
+}
+
+/* ── Extra small screens (< 480px) ── */
+@media (max-width: 480px) {
+  .overview-kpi-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .dashboard-topbar h1 {
+    font-size: 1rem !important;
+  }
+
+  /* Buttons stack column on very small */
+  .inbox-reply-actions {
+    flex-direction: column !important;
+  }
+
+  .inbox-reply-actions button {
+    width: 100% !important;
+  }
 }

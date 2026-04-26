@@ -170,11 +170,11 @@ export default function Inbox({ user }) {
   }
 
   return (
-    <div style={styles.container}>
+    <div className="inbox-container" style={styles.container}>
       {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           PANEL 1: Filters (200px)
           ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <div style={styles.filterPanel}>
+      <div className="inbox-filter-panel" style={styles.filterPanel}>
         <h3 style={styles.filterTitle}>Views</h3>
 
         {[
@@ -218,7 +218,7 @@ export default function Inbox({ user }) {
       {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           PANEL 2: Ticket List (320px)
           ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <div style={styles.listPanel}>
+      <div className="inbox-list-panel" style={styles.listPanel}>
         {loading ? (
           <div style={styles.emptyState}>Loading...</div>
         ) : filteredTickets.length === 0 ? (
@@ -272,7 +272,7 @@ export default function Inbox({ user }) {
       {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           PANEL 3: Ticket Detail (flex-1)
           ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <div style={styles.detailPanel}>
+      <div className="inbox-detail-panel" style={styles.detailPanel}>
         {!selectedTicket ? (
           <div style={styles.emptyDetail}>
             <span style={{ fontSize: '1.2rem', fontWeight: 700, color: '#94A3B8' }}>Inbox</span>
@@ -371,7 +371,7 @@ export default function Inbox({ user }) {
 
             {/* ── Reply Editor ────────────────────────────────── */}
             {selectedTicket.status !== 'resolved' && (
-              <div style={styles.replyBar}>
+              <div className="inbox-reply-bar" style={styles.replyBar}>
                 <textarea
                   value={replyText}
                   onChange={(e) => setReplyText(e.target.value)}
@@ -385,7 +385,7 @@ export default function Inbox({ user }) {
                     }
                   }}
                 />
-                <div style={styles.replyActions}>
+                <div className="inbox-reply-actions" style={styles.replyActions}>
                   <button
                     onClick={handleSendReply}
                     disabled={!replyText.trim() || sending}

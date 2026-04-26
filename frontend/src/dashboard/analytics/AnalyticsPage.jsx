@@ -19,7 +19,7 @@
 //   into a branded PDF with org name and date range.
 // -----------------------------------------------------------------------------
 
-import { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import api from '../../lib/api'
 import {
   AreaChart, Area, BarChart, Bar, LineChart, Line,
@@ -103,12 +103,12 @@ export default function AnalyticsPage() {
 
   if (loading) {
     return (
-      <div style={s.page}>
-        <div style={s.header}>
+      <div className="analytics-page" style={s.page}>
+        <div className="analytics-header" style={s.header}>
           <h1 style={s.title}>Analytics</h1>
           <p style={s.subtitle}>Crunching your data...</p>
         </div>
-        <div style={s.loadingGrid}>
+        <div className="analytics-loading-grid" style={s.loadingGrid}>
           {[1,2,3,4,5,6].map(i => <div key={i} style={s.skeletonCard} />)}
         </div>
       </div>
@@ -135,9 +135,9 @@ export default function AnalyticsPage() {
   ].filter(d => d.value > 0)
 
   return (
-    <div style={s.page}>
+    <div className="analytics-page" style={s.page}>
       {/* ── Header ── */}
-      <div style={s.header}>
+      <div className="analytics-header" style={s.header}>
         <div>
           <h1 style={s.title}>Analytics</h1>
           <p style={s.subtitle}>
@@ -162,7 +162,7 @@ export default function AnalyticsPage() {
 
       {/* ── Charts Grid ── */}
       <div ref={reportRef}>
-        <div style={s.grid2}>
+        <div className="analytics-grid2" style={s.grid2}>
           {/* Satisfaction Trend */}
           <Card title="Customer Satisfaction" subtitle="Higher is better (100 = happy)">
             <ResponsiveContainer width="100%" height={220}>
@@ -223,7 +223,7 @@ export default function AnalyticsPage() {
           </Card>
         </div>
 
-        <div style={s.grid3}>
+        <div className="analytics-grid3" style={s.grid3}>
           {/* Resolution Breakdown */}
           <Card title="Resolution Breakdown" subtitle="Who handled the tickets?">
             {donutData.length === 0 ? (
@@ -299,10 +299,10 @@ export default function AnalyticsPage() {
 
 function Card({ title, subtitle, children }) {
   return (
-    <div style={s.card}>
+    <div className="analytics-card" style={s.card}>
       <h3 style={s.cardTitle}>{title}</h3>
       {subtitle && <p style={s.cardSub}>{subtitle}</p>}
-      <div style={{ marginTop: 12 }}>{children}</div>
+      <div style={{ marginTop: 12, minWidth: 0 }}>{children}</div>
     </div>
   )
 }
@@ -311,9 +311,55 @@ function Heatmap({ grid, maxValue }) {
   const dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
   const hours = Array.from({ length: 24 }, (_, i) => i)
 
+  // On small screens, group into 2-hour blocks to avoid horizontal scroll
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
+
+  if (isMobile) {
+    // Condensed: 12 columns (2-hour blocks)
+    const condensedHours = Array.from({ length: 12 }, (_, i) => i * 2)
+    return (
+      <div>
+        <div style={{ display: 'grid', gridTemplateColumns: '32px repeat(12, 1fr)', gap: 2 }}>
+          <div />
+          {condensedHours.map(h => (
+            <div key={h} style={{ fontSize: '0.55rem', color: '#94A3B8', textAlign: 'center' }}>
+              {h}
+            </div>
+          ))}
+          {grid.map((row, dayIdx) => (
+            <React.Fragment key={`row-${dayIdx}`}>
+              <div style={{ fontSize: '0.6rem', color: '#64748B', display: 'flex', alignItems: 'center' }}>
+                {dayLabels[dayIdx].charAt(0)}
+              </div>
+              {condensedHours.map((startH) => {
+                const val = row[startH] + (row[startH + 1] || 0)
+                const intensity = maxValue > 0 ? (val / 2) / maxValue : 0
+                return (
+                  <div
+                    key={`${dayIdx}-${startH}`}
+                    title={`${dayLabels[dayIdx]} ${startH}-${startH+2}h — ${val} tickets`}
+                    style={{
+                      aspectRatio: '1',
+                      borderRadius: 2,
+                      background: intensity === 0
+                        ? '#F1F5F9'
+                        : `rgba(99, 102, 241, ${0.15 + Math.min(intensity, 1) * 0.85})`,
+                      cursor: 'default',
+                    }}
+                  />
+                )
+              })}
+            </React.Fragment>
+          ))}
+        </div>
+        <p style={{ fontSize: '0.6rem', color: '#94A3B8', marginTop: 6, textAlign: 'center' }}>2-hour blocks</p>
+      </div>
+    )
+  }
+
   return (
-    <div style={{ overflowX: 'auto' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: '40px repeat(24, 1fr)', gap: 2, minWidth: 500 }}>
+    <div>
+      <div style={{ display: 'grid', gridTemplateColumns: '40px repeat(24, 1fr)', gap: 2 }}>
         {/* Header row */}
         <div />
         {hours.map(h => (
@@ -323,8 +369,8 @@ function Heatmap({ grid, maxValue }) {
         ))}
         {/* Data rows */}
         {grid.map((row, dayIdx) => (
-          <>
-            <div key={`label-${dayIdx}`} style={{ fontSize: '0.7rem', color: '#64748B', display: 'flex', alignItems: 'center' }}>
+          <React.Fragment key={`row-${dayIdx}`}>
+            <div style={{ fontSize: '0.7rem', color: '#64748B', display: 'flex', alignItems: 'center' }}>
               {dayLabels[dayIdx]}
             </div>
             {row.map((val, hourIdx) => {
@@ -345,7 +391,7 @@ function Heatmap({ grid, maxValue }) {
                 />
               )
             })}
-          </>
+          </React.Fragment>
         ))}
       </div>
     </div>
@@ -439,6 +485,8 @@ const s = {
     borderRadius: 16,
     padding: 24,
     boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
+    overflow: 'hidden',
+    minWidth: 0,
   },
   cardTitle: {
     fontFamily: 'Syne, sans-serif',

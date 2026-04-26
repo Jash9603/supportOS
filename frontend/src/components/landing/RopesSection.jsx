@@ -8,13 +8,15 @@ import { ROPE1, ROPE2, ROPE3 } from './ticketData'
 export default function RopesSection() {
   return (
     <section
+      className="ropes-section"
       style={{
         height: '100vh',
         display: 'flex',
         flexDirection: 'column',
-        padding: '48px 0 32px',
+        padding: '48px 16px 32px',
         gap: 16,
         position: 'relative',
+        overflow: 'hidden',
       }}
     >
       {/* Section caption */}

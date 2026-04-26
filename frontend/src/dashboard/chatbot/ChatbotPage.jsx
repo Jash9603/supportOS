@@ -151,9 +151,9 @@ export default function ChatbotPage() {
   }
 
   return (
-    <div style={styles.container}>
+    <div className="chatbot-container" style={styles.container}>
       {/* ── Header ── */}
-      <div style={styles.header}>
+      <div className="chatbot-header" style={styles.header}>
         <div>
           <h2 style={styles.title}>Chatbot Configuration</h2>
           <p style={styles.subtitle}>Train your AI assistant with your company's documents.</p>
@@ -177,7 +177,7 @@ export default function ChatbotPage() {
         </div>
       </div>
 
-      <div style={styles.grid}>
+      <div className="chatbot-grid" style={styles.grid}>
         {/* ── Left Column: Knowledge Base ── */}
         <div style={styles.card}>
           <h3 style={styles.cardTitle}>Knowledge Base</h3>

@@ -35,7 +35,7 @@ export default function Login() {
       <div className="auth-card" style={{ animation: 'fadeInUp 0.5s ease forwards' }}>
 
         {/* Heading */}
-        <h1 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: '1.8rem', marginBottom: 6, color: '#0D0D0B', letterSpacing: '-0.02em' }}>
+        <h1 style={{ fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 800, fontSize: '1.8rem', marginBottom: 6, color: '#0D0D0B', letterSpacing: '-0.02em' }}>
           Welcome back.
         </h1>
         <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.88rem', color: '#4A4743', marginBottom: 30 }}>

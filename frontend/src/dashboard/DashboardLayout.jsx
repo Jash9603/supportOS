@@ -27,8 +27,12 @@
 //   to display the user's name and org.
 // -----------------------------------------------------------------------------
 
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { NavLink, Outlet, useNavigate, useOutletContext, useLocation } from 'react-router-dom'
 import { authApi } from '../lib/api'
+import api from '../lib/api'
+import useInboxSocket from '../lib/hooks/useInboxSocket'
+import NotificationPanel from '../components/NotificationPanel'
 
 // ── SVG Icons (inline, no dependency needed) ────────────────────────────────
 // These are simple SVG paths so we don't need to install lucide-react for MVP.
@@ -69,6 +73,16 @@ const icons = {
       <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
     </svg>
   ),
+  hamburger: (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" />
+    </svg>
+  ),
+  close: (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+  ),
 }
 
 // ── Navigation items config ─────────────────────────────────────────────────
@@ -94,10 +108,73 @@ export default function DashboardLayout() {
   const navigate = useNavigate()
   const location = useLocation()
   const { user } = useOutletContext()
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [notifOpen, setNotifOpen] = useState(false)
+  const [notifications, setNotifications] = useState([])
+  const [unreadCount, setUnreadCount] = useState(0)
+  const bellRef = useRef(null)
+
+  // Connect to the org's real-time WebSocket (same one Inbox uses)
+  const { lastEvent } = useInboxSocket(user?.org_id)
 
   // Extract current page name from URL: /dashboard/inbox → "inbox"
   const currentSegment = location.pathname.split('/').pop()
   const pageTitle = pageTitles[currentSegment] || 'Dashboard'
+
+  // Close sidebar on route change (mobile)
+  useEffect(() => {
+    setSidebarOpen(false)
+  }, [location.pathname])
+
+  // Prevent body scroll when mobile sidebar is open
+  useEffect(() => {
+    if (sidebarOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => { document.body.style.overflow = '' }
+  }, [sidebarOpen])
+
+  // Fetch initial notifications on mount
+  useEffect(() => {
+    api.get('/notifications')
+      .then(res => {
+        setNotifications(res.data.notifications || [])
+        setUnreadCount(res.data.unread_count || 0)
+      })
+      .catch(() => {}) // Silently fail — notifications are non-critical
+  }, [])
+
+  // Listen for real-time notification events from WS
+  useEffect(() => {
+    if (!lastEvent || lastEvent.type !== 'notification') return
+
+    const newNotif = {
+      id: lastEvent.id,
+      type: lastEvent.notif_type,
+      title: lastEvent.title,
+      body: lastEvent.body,
+      ticket_id: lastEvent.ticket_id,
+      is_read: false,
+      created_at: lastEvent.created_at || new Date().toISOString(),
+    }
+
+    setNotifications(prev => [newNotif, ...prev].slice(0, 30))
+    setUnreadCount(prev => prev + 1)
+  }, [lastEvent])
+
+  const handleMarkAllRead = useCallback(() => {
+    api.patch('/notifications/read-all').catch(() => {})
+    setNotifications(prev => prev.map(n => ({ ...n, is_read: true })))
+    setUnreadCount(0)
+  }, [])
+
+  const handleMarkRead = useCallback((id) => {
+    api.patch(`/notifications/${id}/read`).catch(() => {})
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n))
+    setUnreadCount(prev => Math.max(0, prev - 1))
+  }, [])
 
   const handleLogout = async () => {
     try {
@@ -108,18 +185,51 @@ export default function DashboardLayout() {
     }
   }
 
+  let warningMessage = null
+  if (user) {
+    const now = new Date()
+    if (user.subscription_ends_at) {
+      const end = new Date(user.subscription_ends_at)
+      const daysLeft = (end - now) / (1000 * 60 * 60 * 24)
+      if (daysLeft >= 0 && daysLeft <= 3) {
+        warningMessage = `Your subscription expires in ${Math.ceil(daysLeft)} day${Math.ceil(daysLeft) === 1 ? '' : 's'}. Please renew.`
+      }
+    } else if (user.trial_ends_at) {
+      const end = new Date(user.trial_ends_at)
+      const daysLeft = (end - now) / (1000 * 60 * 60 * 24)
+      if (daysLeft >= 0 && daysLeft <= 3) {
+        warningMessage = `Your free trial expires in ${Math.ceil(daysLeft)} day${Math.ceil(daysLeft) === 1 ? '' : 's'}. Please subscribe.`
+      }
+    }
+  }
+
   return (
-    <div style={styles.shell}>
+    <div className="dashboard-shell">
+      {/* ── Mobile overlay ── */}
+      {sidebarOpen && (
+        <div
+          className="sidebar-overlay"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           SIDEBAR (240px, dark slate)
           ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <aside style={styles.sidebar}>
+      <aside className={`dashboard-sidebar ${sidebarOpen ? 'open' : ''}`}>
 
-        {/* ── Logo ────────────────────────────────────────────── */}
+        {/* ── Logo + Close button (mobile) ──────────────────── */}
         <div style={styles.logoWrap}>
           <span style={styles.logoText}>
             Support<span style={{ color: '#F59E0B' }}>OS</span>
           </span>
+          <button
+            className="sidebar-close-btn"
+            onClick={() => setSidebarOpen(false)}
+            aria-label="Close menu"
+          >
+            {icons.close}
+          </button>
         </div>
 
         {/* ── Navigation Links ────────────────────────────────── */}
@@ -164,16 +274,51 @@ export default function DashboardLayout() {
           ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
       <div style={styles.mainArea}>
 
+        {warningMessage && (
+          <div style={{
+            background: '#FEF08A', color: '#854D0E', padding: '10px 32px',
+            fontSize: '0.85rem', fontWeight: 600, borderBottom: '1px solid #FDE047',
+            display: 'flex', justifyContent: 'center'
+          }}>
+            {warningMessage}
+          </div>
+        )}
+
         {/* ── Top Header Bar ──────────────────────────────────── */}
-        <header style={styles.topBar}>
+        <header className="dashboard-topbar">
+          {/* Hamburger (mobile only) */}
+          <button
+            className="hamburger-btn"
+            onClick={() => setSidebarOpen(true)}
+            aria-label="Open menu"
+          >
+            {icons.hamburger}
+          </button>
           <h1 style={styles.pageTitle}>{pageTitle}</h1>
           <div style={styles.topBarRight}>
             {/* Notification bell */}
-            <button style={styles.bellBtn} title="Notifications">
-              {icons.bell}
-              {/* Unread dot (hidden for now — Phase 4 will populate) */}
-              <span style={styles.bellDot} />
-            </button>
+            <div style={{ position: 'relative' }} ref={bellRef}>
+              <button
+                style={styles.bellBtn}
+                title="Notifications"
+                onClick={() => setNotifOpen(prev => !prev)}
+              >
+                {icons.bell}
+                {unreadCount > 0 && (
+                  <span style={styles.bellBadge}>
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
+              </button>
+              {notifOpen && (
+                <NotificationPanel
+                  notifications={notifications}
+                  onMarkAllRead={handleMarkAllRead}
+                  onMarkRead={handleMarkRead}
+                  onClose={() => setNotifOpen(false)}
+                />
+              )}
+            </div>
             {/* User avatar (small) */}
             <div style={styles.topAvatar}>
               {(user?.name || 'U').charAt(0).toUpperCase()}
@@ -192,26 +337,12 @@ export default function DashboardLayout() {
 
 // ── Styles ───────────────────────────────────────────────────────────────────
 const styles = {
-  shell: {
-    display: 'flex',
-    height: '100vh',
-    background: '#F8FAFC',
-    fontFamily: 'Inter, system-ui, sans-serif',
-  },
-
-  // Sidebar
-  sidebar: {
-    width: 240,
-    background: '#0F172A',
-    display: 'flex',
-    flexDirection: 'column',
-    flexShrink: 0,
-    borderRight: '1px solid #1E293B',
-  },
+  // Logo
   logoWrap: {
     padding: '24px 20px 28px',
     display: 'flex',
     alignItems: 'center',
+    justifyContent: 'space-between',
     gap: 8,
   },
   logoText: {
@@ -309,16 +440,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     overflow: 'hidden',
-  },
-  topBar: {
-    height: 60,
-    padding: '0 32px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    background: '#FFFFFF',
-    borderBottom: '1px solid #E2E8F0',
-    flexShrink: 0,
+    minWidth: 0,
   },
   pageTitle: {
     fontFamily: 'Syne, sans-serif',
@@ -343,15 +465,23 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
   },
-  bellDot: {
+  bellBadge: {
     position: 'absolute',
-    top: 2,
-    right: 2,
-    width: 7,
-    height: 7,
-    borderRadius: '50%',
+    top: -4,
+    right: -6,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
     background: '#EF4444',
+    color: '#FFFFFF',
+    fontSize: '0.65rem',
+    fontWeight: 700,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '0 4px',
     border: '2px solid #FFFFFF',
+    lineHeight: 1,
   },
   topAvatar: {
     width: 32,

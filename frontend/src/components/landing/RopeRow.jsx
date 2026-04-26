@@ -8,8 +8,10 @@ export default function RopeRow({ tickets }) {
   return (
     <div style={{ position: 'relative', width: '100%', flex: 1, minHeight: 0 }}>
 
-      {/* Rope SVG — catenary curve, anchor pins at both ends */}
+      {/* Rope SVG — catenary curve, anchor pins at both ends.
+          Hidden on mobile via CSS class since the marquee scrolls horizontally. */}
       <svg
+        className="rope-svg"
         style={{
           position: 'absolute',
           top: 0, left: 0,
@@ -43,15 +45,17 @@ export default function RopeRow({ tickets }) {
         />
       </svg>
 
-      {/* Cards evenly distributed below the rope. Wrapped in marquee class for mobile. */}
+      {/* Cards evenly distributed below the rope. Wrapped in marquee class for mobile.
+          The rope-cards-container has CSS mask-image to fade edges on mobile. */}
       <div
+        className="rope-cards-container"
         style={{
           display: 'flex',
           justifyContent: 'space-around',
           alignItems: 'flex-start',
           padding: '4px 5% 0',
           height: '100%',
-          overflow: 'hidden', // hides the scrolling duplicate on mobile
+          overflow: 'hidden',
           width: '100%',
         }}
       >

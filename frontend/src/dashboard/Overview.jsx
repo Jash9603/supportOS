@@ -16,6 +16,7 @@
 // -----------------------------------------------------------------------------
 
 import { useState, useEffect } from 'react'
+import { useOutletContext } from 'react-router-dom'
 import api from '../lib/api'
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
@@ -23,6 +24,7 @@ import {
 } from 'recharts'
 
 export default function Overview() {
+  const { user } = useOutletContext()
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -38,18 +40,32 @@ export default function Overview() {
 
   const { summary, daily_volume, recent_tickets } = data
 
+  let planDisplay = "Inactive"
+  if (user?.sub_status === 'active') {
+    if (user.subscription_ends_at) {
+      planDisplay = `Active (Ends: ${new Date(user.subscription_ends_at).toLocaleDateString()})`
+    } else if (user.trial_ends_at) {
+      planDisplay = `Free Trial (Ends: ${new Date(user.trial_ends_at).toLocaleDateString()})`
+    } else {
+      planDisplay = "Active"
+    }
+  }
+
   return (
-    <div style={styles.container}>
+    <div className="overview-container" style={styles.container}>
       {/* ── Header ── */}
-      <div style={styles.header}>
+      <div className="overview-header" style={styles.header}>
         <div>
           <h1 style={styles.title}>Overview</h1>
           <p style={styles.subtitle}>Your support operations at a glance</p>
         </div>
+        <div style={{ fontWeight: 'bold', color: '#1F2937', background: '#F3F4F6', padding: '8px 16px', borderRadius: '8px', fontSize: '0.9rem' }}>
+          Plan: {planDisplay}
+        </div>
       </div>
 
       {/* ── KPI Cards ── */}
-      <div style={styles.kpiGrid}>
+      <div className="overview-kpi-grid" style={styles.kpiGrid}>
         <KpiCard
           label="Total Tickets"
           value={summary.total_tickets_7d}
@@ -77,7 +93,7 @@ export default function Overview() {
       </div>
 
       {/* ── Chart + Recent Tickets ── */}
-      <div style={styles.bottomGrid}>
+      <div className="overview-bottom-grid" style={styles.bottomGrid}>
         {/* Chart Card */}
         <div style={styles.chartCard}>
           <h3 style={styles.cardTitle}>Ticket Volume</h3>
@@ -425,11 +441,14 @@ const styles = {
   // ── Table ──
   tableWrap: {
     flex: 1,
+    overflowX: 'auto',
     overflowY: 'auto',
     marginTop: 16,
+    WebkitOverflowScrolling: 'touch',
   },
   table: {
     width: '100%',
+    minWidth: 480,
     borderCollapse: 'collapse',
   },
   th: {

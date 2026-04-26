@@ -30,9 +30,33 @@ export default function ProtectedRoute() {
     )
   }
 
+  // Check for Expiration
+  let isExpired = user?.sub_status === 'inactive'
+  
+  if (user) {
+    const now = new Date()
+    
+    // Check if Trial Expired
+    if (user.trial_ends_at) {
+      const trialEnds = new Date(user.trial_ends_at)
+      if (now > trialEnds && !user.subscription_ends_at) {
+        isExpired = true
+      }
+    }
+    
+    // Check if Paid Subscription Expired
+    if (user.subscription_ends_at) {
+      const subEnds = new Date(user.subscription_ends_at)
+      if (now > subEnds) {
+        isExpired = true
+      }
+    }
+  }
+
   // Enforce Subscription Wall
-  if (user && user.sub_status === 'inactive') {
-    return <BillingGate user={user} />
+  if (isExpired) {
+    const hasPastHistory = !!(user.trial_ends_at || user.subscription_ends_at)
+    return <BillingGate user={user} isRenew={hasPastHistory} />
   }
 
   return <Outlet context={{ user }} />

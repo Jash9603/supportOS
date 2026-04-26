@@ -20,7 +20,7 @@ export default function AuthLayout({ children }) {
       <Link
         to="/"
         style={{
-          fontFamily: 'Syne, sans-serif',
+          fontFamily: '"Plus Jakarta Sans", sans-serif',
           fontWeight: 800,
           fontSize: '1.4rem',
           color: '#0D0D0B',

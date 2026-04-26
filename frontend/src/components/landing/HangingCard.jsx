@@ -73,7 +73,7 @@ export default function HangingCard({
                     width: 26, height: 26, borderRadius: '50%',
                     background: bg, flexShrink: 0,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontFamily: 'Syne, sans-serif', fontWeight: 800,
+                    fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 800,
                     fontSize: '0.6rem', color: '#fff',
                   }}
                 >

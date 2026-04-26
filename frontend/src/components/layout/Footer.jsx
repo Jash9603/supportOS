@@ -17,7 +17,7 @@ export default function Footer() {
     >
       <span
         style={{
-          fontFamily: 'Syne, sans-serif',
+          fontFamily: '"Plus Jakarta Sans", sans-serif',
           fontWeight: 800,
           fontSize: '1rem',
           color: '#0D0D0B',

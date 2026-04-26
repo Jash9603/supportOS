@@ -2,21 +2,20 @@
 // Screen 1 (100vh): Large headline, subtitle, CTA buttons, animated scroll hint.
 
 import { Link } from 'react-router-dom'
-import Navbar from '../layout/Navbar'
 
 export default function HeroSection() {
   return (
     <section
       style={{
-        height: '100vh',
+        minHeight: '100vh',
         display: 'flex',
         flexDirection: 'column',
         position: 'relative',
+        paddingBottom: 60,
       }}
     >
-      <Navbar />
 
-      {/* Vertically centred hero content */}
+      {/* Hero content */}
       <div
         style={{
           flex: 1,
@@ -24,17 +23,17 @@ export default function HeroSection() {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          padding: '0 5% 48px',
+          padding: '40px 5% 48px',
           textAlign: 'center',
           animation: 'fadeInUp 0.65s ease both',
         }}
       >
         <h1
           style={{
-            fontFamily: 'Syne, sans-serif',
+            fontFamily: '"Plus Jakarta Sans", sans-serif',
             fontWeight: 800,
             fontSize: 'clamp(2rem, 3.5vw, 3.5rem)',
-            lineHeight: 1.1,
+            lineHeight: 1.15,
             letterSpacing: '-0.03em',
             color: '#0D0D0B',
             maxWidth: 860,
@@ -60,7 +59,7 @@ export default function HeroSection() {
 
         <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
           <Link to="/signup" className="btn-primary">Start for free →</Link>
-          <Link to="/login"  className="btn-outline">I have an account</Link>
+          <Link to="/login" className="btn-outline">I have an account</Link>
         </div>
 
         {/* Micro-copy — removes pre-click objection */}
@@ -69,10 +68,41 @@ export default function HeroSection() {
           fontSize: '0.72rem',
           color: '#B0ABA3',
           marginTop: 12,
+          marginBottom: 48,
           letterSpacing: '0.01em',
         }}>
           No credit card required &nbsp;&middot;&nbsp; Free for first 500 tickets
         </p>
+
+        {/* Video Integration */}
+        <div
+          style={{
+            width: '100%',
+            maxWidth: 900,
+            background: '#ffffff',
+            borderRadius: 12,
+            boxShadow: '0 20px 40px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.05)',
+            border: '1px solid rgba(0,0,0,0.06)',
+            overflow: 'hidden',
+            animation: 'fadeInUp 1s ease both',
+            animationDelay: '0.2s',
+          }}
+        >
+          {/* Simple Mac OS mock header */}
+          <div style={{ display: 'flex', gap: 6, padding: '12px 16px', background: '#F8FAFC', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
+            <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#ff5f56' }} />
+            <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#ffbd2e' }} />
+            <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#27c93f' }} />
+          </div>
+          <video
+            src={import.meta.env.VITE_HERO_VIDEO_URL || `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/static/demo.mp4`}
+            autoPlay
+            loop
+            muted
+            playsInline
+            style={{ width: '100%', display: 'block' }}
+          />
+        </div>
       </div>
 
       {/* Bouncing scroll indicator */}

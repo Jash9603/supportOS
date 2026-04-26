@@ -1,24 +1,57 @@
 import { useState, useEffect } from 'react'
 import api, { authApi } from '../lib/api'
 
-export default function BillingGate({ user }) {
+export default function BillingGate({ user, isRenew }) {
   const [referralCode, setReferralCode] = useState('')
   const [loading, setLoading] = useState(false)
+  const [loadingPlan, setLoadingPlan] = useState(null)
   const [error, setError] = useState('')
 
   // Automatically check if the backend webhook updated the account
   useEffect(() => {
+    // 1. Process URL Query Params from Dodo Payments Redirect
+    const timer = setTimeout(() => {
+      const params = new URLSearchParams(window.location.search)
+      const status = params.get('status')
+      
+      if (status === 'succeeded') {
+        setError('')
+        setLoadingPlan('succeeded') // Hijack this state as a visually pleasing loader
+      } else if (status === 'failed' || status === 'user_droped') {
+        setError('Payment was cancelled or failed. Please try again.')
+      }
+
+      // Cleanup query params so it doesn't persist on refresh
+      if (status) {
+        window.history.replaceState({}, document.title, window.location.pathname)
+      }
+    }, 100)
+
+    // 2. Poll Database for Webhook completion (max 5 times = 15 seconds)
+    let pollCount = 0
     const intervalId = setInterval(async () => {
+      pollCount++
+      if (pollCount > 5) {
+        clearInterval(intervalId)
+        setLoadingPlan(null) // Break the infinite loader
+        setError('We could not verify your payment. If your card was charged, please contact support or try again.')
+        return
+      }
+
       try {
         const res = await authApi.me()
-        if (res.data.sub_status === 'active') {
+        if (res.data.sub_status === 'active' && new Date(res.data.subscription_ends_at || res.data.trial_ends_at) > new Date()) {
           window.location.reload()
         }
       } catch (err) {
-        // Ignore
+        // Ignore network errors but allow the timeout block above to eventually kill it
       }
     }, 3000)
-    return () => clearInterval(intervalId)
+
+    return () => {
+      clearInterval(intervalId)
+      clearTimeout(timer)
+    }
   }, [])
 
   const handleApplyReferral = async () => {
@@ -35,56 +68,101 @@ export default function BillingGate({ user }) {
     }
   }
 
-  // Replace with your actual Lemon Squeezy checkout URLs for the specific plan variants
-  const getCheckoutUrl = (variantId) => {
-    // We attach the user's org_id as custom_data so the webhook knows who paid
-    return `https://ontaraai.lemonsqueezy.com/checkout/buy/${variantId}?checkout[custom][org_id]=${user.org_id}`
+  // Generate Dodo Payments Checkout session
+  const handleSubscribe = async (planType) => {
+    setLoadingPlan(planType)
+    setError('')
+    try {
+      const payload = {
+        plan: planType,
+        success_url: `${window.location.origin}/dashboard?status=succeeded`,
+        cancel_url: `${window.location.origin}/dashboard?status=failed`
+      }
+
+      const res = await api.post('/billing/create-checkout', payload)
+
+      if (res.data && res.data.checkout_url) {
+        window.location.href = res.data.checkout_url
+      } else {
+        setError('Checkout URL not returned from the server.')
+      }
+
+    } catch (err) {
+      console.error(err)
+      setError(err.response?.data?.detail || "Failed to initiate payment. Please try again later.")
+    } finally {
+      if (loadingPlan !== 'succeeded') {
+        setLoadingPlan(null)
+      }
+    }
   }
 
   return (
-    <div style={styles.overlay}>
-      <div style={styles.card}>
+    <div className="billing-overlay" style={styles.overlay}>
+      <div className="billing-card" style={styles.card}>
         <div style={styles.header}>
-          <h1 style={styles.title}>Activate Your Account</h1>
+          <h1 style={styles.title}>{isRenew ? "Subscription Expired" : "Activate Your Account"}</h1>
           <p style={styles.subtitle}>
-            Welcome to Support<b>OS</b>! To access your dashboard, select a plan below.
-            All plans include a 7-day free trial.
+            {isRenew 
+              ? "Your access to SupportOS has expired. To regain access to your dashboard and chat widgets, please renew your plan below." 
+              : "Welcome to SupportOS! To access your dashboard, select a plan below. All plans include a 7-day free trial."}
           </p>
         </div>
 
-        <div style={styles.plansContainer}>
+        <div className="billing-plans" style={styles.plansContainer}>
 
           {/* ────── MONTHLY PLAN ────── */}
           <div style={styles.planCard}>
-            <h3 style={{ margin: 0 }}>Monthly</h3>
+            <h3 style={{ margin: 0, fontFamily: '"Plus Jakarta Sans", sans-serif' }}>Monthly</h3>
             <p style={{ fontSize: '0.85rem', color: '#64748B' }}>$19/month</p>
 
             <div style={{ marginTop: 24 }}>
-              <a
-                href={getCheckoutUrl("159a4153-f869-4300-8aa6-c02f6786e32e")}
-                style={{ ...styles.btn, background: '#0D0D0B', color: 'white', display: 'block', textDecoration: 'none' }}
+              <button
+                onClick={() => handleSubscribe('monthly')}
+                disabled={loadingPlan !== null}
+                style={{ 
+                  ...styles.btn, 
+                  background: '#0D0D0B', 
+                  color: 'white', 
+                  display: 'block', 
+                  opacity: loadingPlan ? 0.7 : 1 
+                }}
               >
-                Subscribe
-              </a>
+                {loadingPlan === 'succeeded' ? 'Verifying Checkout...' : loadingPlan === 'monthly' ? 'Loading...' : 'Subscribe'}
+              </button>
             </div>
           </div>
 
           {/* ────── YEARLY PLAN ────── */}
           <div style={styles.planCard}>
-            <h3 style={{ margin: 0 }}>Yearly</h3>
+            <h3 style={{ margin: 0, fontFamily: '"Plus Jakarta Sans", sans-serif' }}>Yearly</h3>
             <p style={{ fontSize: '0.85rem', color: '#64748B' }}>$199/year (Save 12%)</p>
 
             <div style={{ marginTop: 24 }}>
-              <a
-                href={getCheckoutUrl("f675d8b0-9f96-47d1-89ec-7c135e38ed2b")}
-                style={{ ...styles.btn, background: '#C8841A', color: 'white', border: 'none', display: 'block', textDecoration: 'none' }}
+              <button
+                onClick={() => handleSubscribe('yearly')}
+                disabled={loadingPlan !== null}
+                style={{ 
+                  ...styles.btn, 
+                  background: '#C8841A', 
+                  color: 'white', 
+                  border: 'none', 
+                  display: 'block', 
+                  opacity: loadingPlan ? 0.7 : 1 
+                }}
               >
-                Subscribe
-              </a>
+                {loadingPlan === 'succeeded' ? 'Verifying Checkout...' : loadingPlan === 'yearly' ? 'Loading...' : 'Subscribe'}
+              </button>
             </div>
           </div>
 
         </div>
+
+        {error && (
+          <div style={{ marginTop: 16, color: '#E11D48', fontSize: '0.85rem', textAlign: 'center', background: '#FFF1F2', padding: 8, borderRadius: 6 }}>
+            {error}
+          </div>
+        )}
 
         <div style={styles.referralContainer}>
           <div style={{ display: 'flex', gap: 8 }}>
@@ -97,13 +175,12 @@ export default function BillingGate({ user }) {
             />
             <button
               onClick={handleApplyReferral}
-              disabled={loading}
+              disabled={loading || loadingPlan !== null}
               style={{ ...styles.btn, width: 'auto', background: 'transparent', color: '#0D0D0B' }}
             >
               {loading ? '...' : 'Apply'}
             </button>
           </div>
-          {error && <p style={{ color: '#E11D48', fontSize: '0.75rem', marginTop: 4, margin: 0 }}>{error}</p>}
         </div>
       </div>
     </div>
@@ -123,7 +200,7 @@ const styles = {
     fontFamily: 'Inter, sans-serif'
   },
   header: { textAlign: 'center', marginBottom: 32 },
-  title: { fontSize: '1.5rem', fontWeight: 700, margin: '0 0 12px', color: '#0D0D0B', fontFamily: 'Syne, sans-serif' },
+  title: { fontSize: '1.5rem', fontWeight: 700, margin: '0 0 12px', color: '#0D0D0B', fontFamily: '"Plus Jakarta Sans", sans-serif' },
   subtitle: { fontSize: '0.95rem', color: '#4A4743', lineHeight: 1.5, margin: 0 },
   plansContainer: {
     display: 'flex', gap: 20, justifyContent: 'space-between', '@media (maxwidth: 600px)': { flexDirection: 'column' }

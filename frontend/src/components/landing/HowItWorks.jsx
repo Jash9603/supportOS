@@ -36,7 +36,7 @@ export default function HowItWorks() {
     >
       <h2
         style={{
-          fontFamily: 'Syne, sans-serif',
+          fontFamily: '"Plus Jakarta Sans", sans-serif',
           fontWeight: 800,
           fontSize: 'clamp(1.8rem, 4vw, 3rem)',
           textAlign: 'center',
@@ -62,7 +62,7 @@ export default function HowItWorks() {
           <div key={n} style={{ borderTop: '3px solid #0D0D0B', paddingTop: 24 }}>
             <span
               style={{
-                fontFamily: 'Syne, sans-serif',
+                fontFamily: '"Plus Jakarta Sans", sans-serif',
                 fontWeight: 800,
                 fontSize: '2.8rem',
                 color: '#E4E0D8',
@@ -74,7 +74,7 @@ export default function HowItWorks() {
             </span>
             <h3
               style={{
-                fontFamily: 'Syne, sans-serif',
+                fontFamily: '"Plus Jakarta Sans", sans-serif',
                 fontWeight: 700,
                 fontSize: '1.15rem',
                 marginBottom: 12,
@@ -111,7 +111,7 @@ export default function HowItWorks() {
       >
         <p
           style={{
-            fontFamily: 'Syne, sans-serif',
+            fontFamily: '"Plus Jakarta Sans", sans-serif',
             fontWeight: 800,
             fontSize: 'clamp(1.4rem, 2.5vw, 2rem)',
             color: '#0D0D0B',
