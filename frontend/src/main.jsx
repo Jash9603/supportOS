@@ -1,4 +1,4 @@
-// main.jsx — App entry point
+// main.jsx - App entry point
 // Wraps the entire app with React Query (for API state) and React Router (for navigation)
 
 import React from 'react'

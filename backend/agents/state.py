@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# agents/state.py — LangGraph State Schema
+# agents/state.py - LangGraph State Schema
 # -----------------------------------------------------------------------------
 #
 # WHAT IS THIS?
@@ -27,7 +27,7 @@ class SupportState(TypedDict):
 
     # ── Confidence & Escalation ───────────────────────────
     confidence: float            # How relevant the retrieved chunks are (0.0 – 1.0)
-    needs_escalation: bool       # True if the bot can't answer → route to human agent
+    needs_escalation: bool       # True if the bot can't answer - route to human agent
 
     # ── Tracking ──────────────────────────────────────────
     ticket_id: Optional[str]     # Postgres ticket ID (for saving bot messages)

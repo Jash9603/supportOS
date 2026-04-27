@@ -1,4 +1,4 @@
-# schemas/settings.py — Request models for Settings API
+# schemas/settings.py - Request models for Settings API
 
 from pydantic import BaseModel
 from typing import Optional

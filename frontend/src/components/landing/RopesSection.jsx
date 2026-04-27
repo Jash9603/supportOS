@@ -34,7 +34,7 @@ export default function RopesSection() {
           whiteSpace: 'nowrap',
         }}
       >
-        Tickets piling up right now — SupportOS answers them instantly
+        Tickets piling up right now? SupportOS answers them instantly
       </p>
 
       <RopeRow tickets={ROPE1} />

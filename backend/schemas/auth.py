@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# schemas/auth.py — Request & Response Shapes for Auth Endpoints
+# schemas/auth.py - Request & Response Shapes for Auth Endpoints
 # -----------------------------------------------------------------------------
 # Pydantic schemas define exactly what JSON shape is expected IN (request body)
 # and what shape is sent OUT (response body) for each auth endpoint.
@@ -32,7 +32,7 @@ class LoginRequest(BaseModel):
 
 
 class UserResponse(BaseModel):
-    """Returned after signup, login, and GET /auth/me — safe to send to frontend."""
+    """Returned after signup, login, and GET /auth/me - safe to send to frontend."""
     id: uuid.UUID
     email: str
     name: str

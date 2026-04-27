@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------
-// lib/hooks/useInboxSocket.js — Real-time Inbox Updates Hook
+// lib/hooks/useInboxSocket.js - Real-time Inbox Updates Hook
 // -----------------------------------------------------------------------------
 //
 // WHAT IS THIS?
@@ -40,7 +40,7 @@ export default function useInboxSocket(orgId) {
       try {
         const data = JSON.parse(event.data)
         // Every event from Redis gets forwarded here.
-        // We just store it — the Inbox component reacts to changes.
+        // We just store it - the Inbox component reacts to changes.
         setLastEvent({ ...data, _ts: Date.now() })
       } catch (err) {
         console.error('[InboxSocket] Parse error:', err)

@@ -17,7 +17,7 @@ const STEPS = [
   {
     n: '03',
     title: 'AI handles the rest',
-    body: 'Customers get instant answers. Complex issues escalate to your inbox — with full context.',
+    body: 'Customers get instant answers. Complex issues escalate to your inbox, with full context.',
   },
 ]
 
@@ -125,7 +125,7 @@ export default function HowItWorks() {
           Join teams who stopped losing customers to slow replies.
         </p>
         <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 14 }}>
-          <Link to="/signup" className="btn-primary">Start for free →</Link>
+          <Link to="/signup" className="btn-primary">Start for free</Link>
           <Link to="/login"  className="btn-outline">I have an account</Link>
         </div>
         <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.72rem', color: '#B0ABA3', letterSpacing: '0.01em' }}>

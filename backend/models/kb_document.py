@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# models/kb_document.py — Knowledge Base Document Table
+# models/kb_document.py - Knowledge Base Document Table
 # -----------------------------------------------------------------------------
 # A "kb_document" is a file that the founder uploads to train the AI bot.
 # Examples: product FAQ PDF, pricing doc, refund policy .txt, etc.

@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------
-// ChatbotPage.jsx — The AI "Brain Control" Dashboard
+// ChatbotPage.jsx - The AI "Brain Control" Dashboard
 // -----------------------------------------------------------------------------
 //
 // WHAT IS THIS PAGE?

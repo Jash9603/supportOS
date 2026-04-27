@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# services/clustering_service.py — Smart Question Clustering via Embeddings
+# services/clustering_service.py - Smart Question Clustering via Embeddings
 # -----------------------------------------------------------------------------
 #
 # WHAT IS THIS?
@@ -175,7 +175,7 @@ def _greedy_cluster(
 def _generate_summaries(clusters: list[dict]) -> list[dict]:
     """
     Use GPT-4o-mini to generate a smart, descriptive cluster title
-    by reading the actual ticket content — not just subjects.
+    by reading the actual ticket content - not just subjects.
     """
     if not clusters:
         return clusters
@@ -186,7 +186,7 @@ def _generate_summaries(clusters: list[dict]) -> list[dict]:
         for cluster in clusters:
             members = cluster.get("members_content", [])
             if len(members) <= 1 and cluster.get("question"):
-                # Single item — still generate a clean summary from content
+                # Single item - still generate a clean summary from content
                 content = members[0] if members else cluster["question"]
                 response = client.chat.completions.create(
                     model="gpt-4o-mini",
@@ -206,7 +206,7 @@ def _generate_summaries(clusters: list[dict]) -> list[dict]:
                 cluster.pop("members_content", None)
                 continue
 
-            # Multiple items — summarize the common theme
+            # Multiple items - summarize the common theme
             content_text = "\n---\n".join(m[:300] for m in members[:8])
 
             response = client.chat.completions.create(
@@ -226,7 +226,7 @@ def _generate_summaries(clusters: list[dict]) -> list[dict]:
             )
             cluster["summary"] = response.choices[0].message.content.strip()
 
-            # Clean up — don't send raw content to frontend
+            # Clean up - don't send raw content to frontend
             cluster.pop("members_content", None)
 
     except Exception as e:

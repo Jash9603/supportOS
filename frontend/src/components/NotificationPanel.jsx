@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------
-// components/NotificationPanel.jsx — Notification Dropdown
+// components/NotificationPanel.jsx - Notification Dropdown
 // -----------------------------------------------------------------------------
 //
 // A floating dropdown that appears when the bell icon is clicked.

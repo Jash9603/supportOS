@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# dependencies.py — Shared FastAPI Dependencies
+# dependencies.py - Shared FastAPI Dependencies
 # -----------------------------------------------------------------------------
 # FastAPI "dependencies" are reusable functions that routes can declare as
 # parameters. FastAPI runs them automatically before the route function.
@@ -36,11 +36,11 @@ async def get_current_user(
     db: AsyncSession = Depends(get_db),
 ) -> User:
     """
-    FastAPI dependency — reads the httpOnly cookie and returns the logged-in user.
+    FastAPI dependency - reads the httpOnly cookie and returns the logged-in user.
 
     Flow:
       1. Read 'access_token' from the request cookie
-      2. Decode the JWT → get the user_id stored inside it
+      2. Decode the JWT to get the user_id stored inside it
       3. Load the User from DB using that user_id
       4. Return the User (or raise 401 if anything fails)
 
@@ -50,7 +50,7 @@ async def get_current_user(
     if not access_token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Not authenticated — please log in",
+            detail="Not authenticated - please log in",
         )
 
     try:
@@ -63,7 +63,7 @@ async def get_current_user(
     except (JWTError, ValueError, Exception):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid or expired token — please log in again",
+            detail="Invalid or expired token - please log in again",
         )
 
     # 3. Load user from DB

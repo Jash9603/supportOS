@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# migrations/env.py — Alembic Migration Runner
+# migrations/env.py - Alembic Migration Runner
 # -----------------------------------------------------------------------------
 # This is the script Alembic runs when you do `alembic upgrade head` or
 # `alembic revision --autogenerate`.
@@ -25,7 +25,7 @@ from core.database import engine, Base
 
 # Import ALL models so Alembic can detect every table.
 # If you skip importing a model here, Alembic will not see it.
-import models  # noqa: F401 — this triggers models/__init__.py which imports all models
+import models  # noqa: F401 - this triggers models/__init__.py which imports all models
 
 # Alembic reads log settings from alembic.ini
 config = context.config
@@ -38,7 +38,7 @@ target_metadata = Base.metadata
 
 # ── Offline mode (generates SQL without a live DB connection) ────────────────
 def run_migrations_offline() -> None:
-    """Run migrations without connecting to DB — produces raw SQL output."""
+    """Run migrations without connecting to DB - produces raw SQL output."""
     url = engine.url
     context.configure(
         url=url,
@@ -65,8 +65,8 @@ def do_run_migrations(connection) -> None:
 def run_migrations_online() -> None:
     """
     Run migrations against a live database.
-    Uses asyncio.run() — NOT the deprecated get_event_loop().
-    Uses async with engine.connect() — NOT .then() (that's JavaScript syntax).
+    Uses asyncio.run() - NOT the deprecated get_event_loop().
+    Uses async with engine.connect() - NOT .then() (that's JavaScript syntax).
     """
     async def run_async_migrations() -> None:
         async with engine.connect() as connection:

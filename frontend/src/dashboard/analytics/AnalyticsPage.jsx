@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------
-// AnalyticsPage.jsx — Deep Analytics Dashboard
+// AnalyticsPage.jsx - Deep Analytics Dashboard
 // -----------------------------------------------------------------------------
 //
 // WHAT IS THIS PAGE?
@@ -269,7 +269,7 @@ export default function AnalyticsPage() {
           </Card>
         </div>
 
-        {/* Response Time Comparison — full width */}
+        {/* Response Time Comparison - full width */}
         <div style={{ marginTop: 20 }}>
           <Card title="Response Time: Bot vs Human" subtitle="Average first-reply time in minutes">
             <ResponsiveContainer width="100%" height={240}>
@@ -337,7 +337,7 @@ function Heatmap({ grid, maxValue }) {
                 return (
                   <div
                     key={`${dayIdx}-${startH}`}
-                    title={`${dayLabels[dayIdx]} ${startH}-${startH+2}h — ${val} tickets`}
+                    title={`${dayLabels[dayIdx]} ${startH}-${startH+2}h - ${val} tickets`}
                     style={{
                       aspectRatio: '1',
                       borderRadius: 2,
@@ -378,7 +378,7 @@ function Heatmap({ grid, maxValue }) {
               return (
                 <div
                   key={`${dayIdx}-${hourIdx}`}
-                  title={`${dayLabels[dayIdx]} ${hourIdx}:00 — ${val} tickets`}
+                  title={`${dayLabels[dayIdx]} ${hourIdx}:00 - ${val} tickets`}
                   style={{
                     aspectRatio: '1',
                     borderRadius: 3,

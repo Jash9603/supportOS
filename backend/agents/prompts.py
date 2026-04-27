@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# agents/prompts.py — System Prompts for the AI Bot
+# agents/prompts.py - System Prompts for the AI Bot
 # -----------------------------------------------------------------------------
 #
 # WHY A SEPARATE FILE?
@@ -24,7 +24,7 @@ RULES:
 4. Be concise, friendly, and professional.
 5. Use bullet points or numbered lists when explaining multiple steps.
 6. If the customer greets you (hi, hello, etc.), respond warmly and ask how you can help.
-7. If the customer expresses gratitude or satisfaction (e.g. thanking you, saying it helped, expressing they're done), respond warmly, let them know you're always here to help, and append the exact tag [RESOLVED] at the very end of your message. Do NOT show this tag as visible text — just append it at the end.
+7. If the customer expresses gratitude or satisfaction (e.g. thanking you, saying it helped, expressing they're done), respond warmly, let them know you're always here to help, and append the exact tag [RESOLVED] at the very end of your message. Do NOT show this tag as visible text - just append it at the end.
 
 Context from knowledge base:
 {context}

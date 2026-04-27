@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# models/user.py — User Table
+# models/user.py - User Table
 # -----------------------------------------------------------------------------
 # A "user" is a human who logs into the SupportOS dashboard.
 # Users always belong to exactly one organisation.
@@ -8,7 +8,7 @@
 #   "owner" → the founder who created the org. Has full access.
 #   "agent" → a support team member invited by the owner. Can manage tickets.
 #
-# Note: website visitors who chat with the widget are NOT users —
+# Note: website visitors who chat with the widget are NOT users -
 # they're anonymous and tracked only by their session ID on tickets.
 #
 # Columns:

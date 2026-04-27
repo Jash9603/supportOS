@@ -1,9 +1,9 @@
 # -----------------------------------------------------------------------------
-# workers/celery_app.py — Celery Application Configuration
+# workers/celery_app.py - Celery Application Configuration
 # -----------------------------------------------------------------------------
 #
 # WHAT IS THIS FILE?
-# Think of this as the "kitchen manager" — it sets up the Celery system.
+# Think of this as the "kitchen manager" - it sets up the Celery system.
 # It tells Celery:
 #   1. WHERE to pick up task orders (Redis = the order board)
 #   2. WHERE to store results when tasks finish (also Redis)
@@ -28,7 +28,7 @@ from celery import Celery
 from core.config import settings
 
 # Create the Celery app instance
-# "supportos" is just a name tag — like naming your kitchen "SupportOS Kitchen"
+# "supportos" is just a name tag - like naming your kitchen "SupportOS Kitchen"
 celery_app = Celery(
     "supportos",
     broker=settings.REDIS_URL,       # WHERE tasks are queued (Redis)
@@ -36,9 +36,9 @@ celery_app = Celery(
     include=["workers.tasks"],       # WHICH Python files contain task functions
 )
 
-# Configuration — how should Celery behave?
+# Configuration - how should Celery behave?
 celery_app.conf.update(
-    task_serializer="json",          # tasks are sent as JSON (not pickle — safer)
+    task_serializer="json",          # tasks are sent as JSON (not pickle, safer)
     result_serializer="json",        # results come back as JSON too
     accept_content=["json"],         # only accept JSON (reject everything else)
     timezone="UTC",                  # all timestamps in UTC

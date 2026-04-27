@@ -1,9 +1,9 @@
 # -----------------------------------------------------------------------------
-# workers/tasks.py — Background Task Definitions
+# workers/tasks.py - Background Task Definitions
 # -----------------------------------------------------------------------------
 #
 # WHAT IS THIS FILE?
-# This is where we define the actual "kitchen recipes" — the heavy jobs
+# This is where we define the actual "kitchen recipes" - the heavy jobs
 # that would be too slow to run inside a normal API request.
 #
 # RIGHT NOW: We have one task → ingest_document
@@ -21,7 +21,7 @@
 #     - API says "Got it, processing!" instantly (200 OK)
 #     - Celery does the heavy lifting in the background
 #     - Frontend polls GET /chatbot/documents/{id}/status every 2 seconds
-#     - Eventually shows ✓ "Indexed — 24 chunks"
+#     - Eventually shows ✓ "Indexed - 24 chunks"
 #
 # HOW TO ADD A NEW TASK:
 #   1. Write a function here decorated with @celery_app.task
@@ -40,7 +40,7 @@ from sqlalchemy.orm import Session as SyncSession, sessionmaker
 from core.config import settings
 
 # Convert async DB URL to sync (asyncpg → psycopg2)
-# Celery can't use async — it has its own event loop
+# Celery can't use async - it has its own event loop
 sync_db_url = settings.DATABASE_URL.replace("postgresql+asyncpg", "postgresql+psycopg2")
 
 

@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# models/__init__.py — Model Registry
+# models/__init__.py - Model Registry
 # -----------------------------------------------------------------------------
 # This file imports ALL database models in one place.
 #

@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# services/rag_service.py — Retrieval-Augmented Generation Service
+# services/rag_service.py - Retrieval-Augmented Generation Service
 # -----------------------------------------------------------------------------
 #
 # WHAT IS THIS?
@@ -14,7 +14,7 @@
 #   Imagine every sentence in your PDF is a point on a giant map.
 #   When a customer asks "What is your refund policy?", we convert that
 #   question into a point on the SAME map. Then we find the 5 closest
-#   PDF sentences — those are the most relevant context for the AI to answer.
+#   PDF sentences - those are the most relevant context for the AI to answer.
 #
 # WHY A SEPARATE SERVICE?
 #   The LangGraph agent (agents/graphs/support_agent.py) calls this service
@@ -42,7 +42,7 @@ def _get_qdrant_client() -> QdrantClient:
 
 
 def _collection_name(org_id: str) -> str:
-    """Each org gets its own Qdrant collection — data is never shared."""
+    """Each org gets its own Qdrant collection - data is never shared."""
     return f"org_{org_id}_kb"
 
 

@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# services/sentiment_service.py — AI-Powered Sentiment Scoring
+# services/sentiment_service.py - AI-Powered Sentiment Scoring
 # -----------------------------------------------------------------------------
 #
 # WHAT IS THIS?

@@ -1,5 +1,5 @@
 /**
- * SupportOS — Embeddable Chat Widget Loader
+ * SupportOS - Embeddable Chat Widget Loader
  *
  * Usage:
  *   <script
@@ -20,7 +20,7 @@ In web development, there are two kinds of files your server can give out:
 
 Dynamic → The server runs code to generate a response. Like when you hit /auth/login, Python runs your FastAPI function, queries the database, and builds a JSON response on the fly.
 Static → The server just hands over a file as-is. No processing. Like serving an image, a CSS file, or a JavaScript file. It's like a file download.
-widget.js never changes based on who's requesting it. It's the same file for every customer. So there's no reason for Python to "process" it — just hand the file over. That's what StaticFiles does.
+widget.js never changes based on who's requesting it. It's the same file for every customer. So there's no reason for Python to "process" it - just hand the file over. That's what StaticFiles does.
 
  */
 

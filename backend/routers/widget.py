@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# routers/widget.py — The Chat Widget API
+# routers/widget.py - The Chat Widget API
 # -----------------------------------------------------------------------------
 #
 # WHY IT WAS CREATED?
@@ -186,7 +186,7 @@ async def widget_websocket(
                 )
             
             elif ticket.status == "resolved":
-                # Customer messaged again on a resolved ticket — re-open it!
+                # Customer messaged again on a resolved ticket - re-open it!
                 # Reset: let AI handle fresh, clear assignment, preserve message history
                 ticket.status = "open"
                 ticket.needs_human = False
@@ -248,10 +248,10 @@ async def widget_websocket(
                                     await websocket.send_text(json.dumps({"type": "token", "content": clean}))
                                 resolve_buffer = ""
                             elif any("[RESOLVED]".startswith(resolve_buffer[-i:]) for i in range(1, len(resolve_buffer) + 1) if resolve_buffer[-i:] == "[RESOLVED]"[:i]):
-                                # Partial match — keep buffering
+                                # Partial match - keep buffering
                                 pass
                             else:
-                                # No match possible — flush and send
+                                # No match possible - flush and send
                                 await websocket.send_text(json.dumps({"type": "token", "content": resolve_buffer}))
                                 resolve_buffer = ""
                     elif event["event"] == "on_chain_end" and event["name"] == "LangGraph":

@@ -1,820 +1,933 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=1920, height=1080">
-<title>SupportOS — Video Scenes</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    width: 1920px;
-    height: 1080px;
-    overflow: hidden;
-    background: #0D0D0B;
-    font-family: 'Inter', sans-serif;
-  }
-
-  .scene {
-    position: absolute;
-    top: 0; left: 0;
-    width: 1920px;
-    height: 1080px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.4s ease;
-  }
-
-  .scene.active {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  /* ── SCENE 1: The Hook ─────────────────────────────── */
-  #scene1 { background: #0D0D0B; }
-
-  #scene1 .line1,
-  #scene1 .line2,
-  #scene1 .line3 {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    color: #FFFFFF;
-    opacity: 0;
-    transform: translateY(20px);
-  }
-
-  #scene1 .line1 {
-    font-size: 96px;
-    letter-spacing: -0.03em;
-  }
-
-  #scene1 .line2 {
-    font-size: 42px;
-    letter-spacing: -0.01em;
-    color: #A09C96;
-    margin-top: 16px;
-  }
-
-  #scene1 .line3 {
-    font-size: 72px;
-    letter-spacing: -0.03em;
-    color: #C8841A;
-    margin-top: 48px;
-  }
-
-  #scene1.active .line1 {
-    animation: fadeSlideUp 0.8s ease 0.3s forwards;
-  }
-  #scene1.active .line2 {
-    animation: fadeSlideUp 0.8s ease 1.5s forwards;
-  }
-  #scene1.active .line3 {
-    animation: fadeSlideUp 0.6s ease 3.2s forwards;
-  }
-
-  /* Notification dot pulse */
-  #scene1 .notif-dot {
-    width: 12px; height: 12px;
-    background: #C8841A;
-    border-radius: 50%;
-    position: absolute;
-    top: 80px; right: 180px;
-    opacity: 0;
-  }
-  #scene1.active .notif-dot {
-    animation: notifPulse 1s ease 0.1s forwards;
-  }
-
-  /* ── SCENE 1B: Chat bubble answer ──────────────────── */
-  #scene1b { background: #0D0D0B; }
-
-  #scene1b .bubble-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 32px;
-    opacity: 0;
-    transform: scale(0.7);
-  }
-
-  #scene1b.active .bubble-container {
-    animation: elasticPop 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s forwards;
-  }
-
-  #scene1b .chat-bubble-icon {
-    width: 100px; height: 100px;
-    background: #C8841A;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 0 60px rgba(200, 132, 26, 0.4);
-  }
-
-  #scene1b .chat-bubble-icon svg {
-    width: 48px;
-    height: 48px;
-    fill: white;
-  }
-
-  /* ── SCENE 2: Brand Reveal ─────────────────────────── */
-  #scene2 { background: #F5F0E8; }
-
-  #scene2 .logo-text {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 120px;
-    color: #0D0D0B;
-    letter-spacing: -0.04em;
-    opacity: 0;
-    transform: scale(0.6);
-  }
-
-  #scene2 .logo-text span {
-    color: #C8841A;
-  }
-
-  #scene2 .tagline {
-    font-family: 'Inter', sans-serif;
-    font-size: 28px;
-    font-weight: 500;
-    color: #6A6661;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    margin-top: 20px;
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-  #scene2.active .logo-text {
-    animation: elasticPop 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s forwards;
-  }
-
-  #scene2.active .tagline {
-    animation: fadeSlideUp 0.7s ease 0.9s forwards;
-  }
-
-  /* ── SCENE 3: Step 01 ──────────────────────────────── */
-  .step-scene { background: #F5F0E8; }
-
-  .step-scene .step-number {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 220px;
-    color: #E4E0D8;
-    opacity: 0;
-    transform: translateX(-80px);
-    line-height: 1;
-  }
-
-  .step-scene .step-title {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 64px;
-    color: #0D0D0B;
-    letter-spacing: -0.03em;
-    margin-top: -20px;
-    opacity: 0;
-    transform: translateY(20px);
-  }
-
-  .step-scene .step-body {
-    font-family: 'Inter', sans-serif;
-    font-weight: 500;
-    font-size: 26px;
-    color: #6A6661;
-    max-width: 700px;
-    text-align: center;
-    line-height: 1.6;
-    margin-top: 24px;
-    opacity: 0;
-    transform: translateY(15px);
-  }
-
-  .step-scene .step-line {
-    width: 120px;
-    height: 4px;
-    background: #0D0D0B;
-    border-radius: 2px;
-    margin-bottom: 32px;
-    opacity: 0;
-    transform: scaleX(0);
-    transform-origin: left;
-  }
-
-  .step-scene.active .step-number {
-    animation: slideFromLeft 0.7s ease 0.2s forwards;
-  }
-  .step-scene.active .step-line {
-    animation: lineGrow 0.5s ease 0.5s forwards;
-  }
-  .step-scene.active .step-title {
-    animation: fadeSlideUp 0.6s ease 0.6s forwards;
-  }
-  .step-scene.active .step-body {
-    animation: fadeSlideUp 0.6s ease 0.9s forwards;
-  }
-
-  /* ── BADGE overlays ────────────────────────────────── */
-  .badge {
-    position: absolute;
-    bottom: 100px;
-    right: 140px;
-    background: #0D0D0B;
-    color: #F5F0E8;
-    font-family: 'Inter', sans-serif;
-    font-weight: 600;
-    font-size: 22px;
-    padding: 16px 32px;
-    border-radius: 12px;
-    opacity: 0;
-    transform: translateX(40px);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-  }
-
-  .badge .icon {
-    font-size: 26px;
-  }
-
-  .step-scene.active .badge {
-    animation: badgeSlideIn 0.5s ease 1.4s forwards;
-  }
-
-  /* ── SCENE: Proof ──────────────────────────────────── */
-  #scene-proof { background: #0D0D0B; }
-
-  #scene-proof .proof-number {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 140px;
-    color: #C8841A;
-    opacity: 0;
-    transform: scale(0.8);
-  }
-
-  #scene-proof .proof-text {
-    font-family: 'Inter', sans-serif;
-    font-weight: 500;
-    font-size: 32px;
-    color: #A09C96;
-    margin-top: 12px;
-    opacity: 0;
-    transform: translateY(15px);
-  }
-
-  #scene-proof.active .proof-number {
-    animation: elasticPop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s forwards;
-  }
-  #scene-proof.active .proof-text {
-    animation: fadeSlideUp 0.6s ease 0.8s forwards;
-  }
-
-  /* ── SCENE: CTA ────────────────────────────────────── */
-  #scene-cta { background: #F5F0E8; }
-
-  #scene-cta .cta-headline {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 56px;
-    color: #0D0D0B;
-    letter-spacing: -0.03em;
-    max-width: 900px;
-    text-align: center;
-    line-height: 1.2;
-    opacity: 0;
-    transform: translateY(20px);
-  }
-
-  #scene-cta .cta-btn {
-    margin-top: 48px;
-    background: #0D0D0B;
-    color: #F5F0E8;
-    font-family: 'Inter', sans-serif;
-    font-weight: 600;
-    font-size: 24px;
-    padding: 22px 56px;
-    border-radius: 12px;
-    opacity: 0;
-    transform: scale(0.8);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
-  }
-
-  #scene-cta .cta-sub {
-    font-family: 'Inter', sans-serif;
-    font-weight: 400;
-    font-size: 18px;
-    color: #B0ABA3;
-    margin-top: 20px;
-    letter-spacing: 0.01em;
-    opacity: 0;
-  }
-
-  #scene-cta.active .cta-headline {
-    animation: fadeSlideUp 0.7s ease 0.3s forwards;
-  }
-  #scene-cta.active .cta-btn {
-    animation: elasticPop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 1.0s forwards;
-  }
-  #scene-cta.active .cta-sub {
-    animation: fadeSlideUp 0.5s ease 1.5s forwards;
-  }
-
-  /* ── SCENE: Placeholder (for screen recordings) ───── */
-  .placeholder-scene {
-    background: #1A1917;
-    position: relative;
-  }
-
-  .placeholder-scene .rec-indicator {
-    position: absolute;
-    top: 48px;
-    left: 48px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    opacity: 0;
-  }
-
-  .placeholder-scene .rec-dot {
-    width: 14px; height: 14px;
-    background: #E53E3E;
-    border-radius: 50%;
-    animation: recBlink 1.2s ease infinite;
-  }
-
-  .placeholder-scene .rec-label {
-    font-family: 'Inter', sans-serif;
-    font-weight: 600;
-    font-size: 18px;
-    color: #E53E3E;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-  }
-
-  .placeholder-scene .placeholder-msg {
-    font-family: 'Inter', sans-serif;
-    font-weight: 500;
-    font-size: 28px;
-    color: #6A6661;
-    text-align: center;
-    max-width: 700px;
-    line-height: 1.6;
-    opacity: 0;
-  }
-
-  .placeholder-scene .placeholder-hint {
-    font-family: 'Inter', sans-serif;
-    font-weight: 400;
-    font-size: 18px;
-    color: #4A4743;
-    margin-top: 16px;
-    opacity: 0;
-  }
-
-  .placeholder-scene.active .rec-indicator {
-    animation: fadeIn 0.3s ease 0.2s forwards;
-  }
-  .placeholder-scene.active .placeholder-msg {
-    animation: fadeIn 0.5s ease 0.3s forwards;
-  }
-  .placeholder-scene.active .placeholder-hint {
-    animation: fadeIn 0.5s ease 0.6s forwards;
-  }
-
-  /* ── Split screen label ────────────────────────────── */
-  #scene-split { background: #0D0D0B; }
-
-  #scene-split .split-container {
-    display: flex;
-    gap: 64px;
-    align-items: center;
-    opacity: 0;
-  }
-
-  #scene-split .split-side {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-  }
-
-  #scene-split .split-box {
-    width: 540px;
-    height: 400px;
-    border-radius: 16px;
-    border: 2px solid #333;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Inter', sans-serif;
-    font-weight: 500;
-    font-size: 22px;
-    color: #555;
-  }
-
-  #scene-split .split-label {
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: 22px;
-    color: #A09C96;
-  }
-
-  #scene-split .split-headline {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 48px;
-    color: #FFFFFF;
-    margin-bottom: 48px;
-    opacity: 0;
-    transform: translateY(20px);
-  }
-
-  #scene-split.active .split-headline {
-    animation: fadeSlideUp 0.6s ease 0.2s forwards;
-  }
-  #scene-split.active .split-container {
-    animation: fadeIn 0.8s ease 0.7s forwards;
-  }
-
-  /* ── Transition overlay ────────────────────────────── */
-  #transition-overlay {
-    position: fixed;
-    top: 0; left: 0;
-    width: 1920px; height: 1080px;
-    background: #0D0D0B;
-    z-index: 100;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-  }
-
-  #transition-overlay.flash {
-    opacity: 1;
-  }
-
-  /* ── Controls ──────────────────────────────────────── */
-  #controls {
-    position: fixed;
-    bottom: 0; left: 0;
-    width: 1920px;
-    background: rgba(0,0,0,0.85);
-    padding: 16px 40px;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    z-index: 200;
-    font-family: 'Inter', sans-serif;
-  }
-
-  #controls button {
-    padding: 10px 24px;
-    border-radius: 8px;
-    border: none;
-    font-family: 'Inter', sans-serif;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  #controls .btn-play {
-    background: #C8841A;
-    color: white;
-  }
-  #controls .btn-prev,
-  #controls .btn-next {
-    background: #333;
-    color: #ccc;
-  }
-  #controls .btn-prev:hover,
-  #controls .btn-next:hover {
-    background: #555;
-  }
-
-  #controls .scene-info {
-    color: #888;
-    font-size: 14px;
-    margin-left: auto;
-  }
-
-  #controls .scene-name {
-    color: #C8841A;
-    font-weight: 600;
-  }
-
-  #controls .hide-hint {
-    color: #555;
-    font-size: 12px;
-  }
-
-  /* ── Keyframes ─────────────────────────────────────── */
-  @keyframes fadeSlideUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: translateY(0);    }
-  }
-
-  @keyframes slideFromLeft {
-    from { opacity: 0; transform: translateX(-80px); }
-    to   { opacity: 1; transform: translateX(0);     }
-  }
-
-  @keyframes elasticPop {
-    from { opacity: 0; transform: scale(0.6); }
-    to   { opacity: 1; transform: scale(1);   }
-  }
-
-  @keyframes lineGrow {
-    from { opacity: 0; transform: scaleX(0); }
-    to   { opacity: 1; transform: scaleX(1); }
-  }
-
-  @keyframes badgeSlideIn {
-    from { opacity: 0; transform: translateX(40px); }
-    to   { opacity: 1; transform: translateX(0);    }
-  }
-
-  @keyframes notifPulse {
-    0%   { opacity: 0; transform: scale(0); }
-    50%  { opacity: 1; transform: scale(1.8); }
-    100% { opacity: 0; transform: scale(2.5); }
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to   { opacity: 1; }
-  }
-
-  @keyframes recBlink {
-    0%, 100% { opacity: 1; }
-    50%      { opacity: 0.2; }
-  }
-
-  /* ── Hide controls during recording ────────────────── */
-  body.recording #controls { display: none; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920, height=1080">
+  <title>SupportOS - Video Scenes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      background: #0D0D0B;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .scene {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 1920px;
+      height: 1080px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+
+    .scene.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* ── SCENE 1: The Hook ─────────────────────────────── */
+    #scene1 {
+      background: #0D0D0B;
+    }
+
+    #scene1 .line1,
+    #scene1 .line2,
+    #scene1 .line3 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      color: #FFFFFF;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    #scene1 .line1 {
+      font-size: 96px;
+      letter-spacing: -0.03em;
+    }
+
+    #scene1 .line2 {
+      font-size: 42px;
+      letter-spacing: -0.01em;
+      color: #A09C96;
+      margin-top: 16px;
+    }
+
+    #scene1 .line3 {
+      font-size: 72px;
+      letter-spacing: -0.03em;
+      color: #C8841A;
+      margin-top: 48px;
+    }
+
+    #scene1.active .line1 {
+      animation: fadeSlideUp 0.8s ease 0.3s forwards;
+    }
+
+    #scene1.active .line2 {
+      animation: fadeSlideUp 0.8s ease 1.5s forwards;
+    }
+
+    #scene1.active .line3 {
+      animation: fadeSlideUp 0.6s ease 3.2s forwards;
+    }
+
+    /* Notification dot pulse */
+    #scene1 .notif-dot {
+      width: 12px;
+      height: 12px;
+      background: #C8841A;
+      border-radius: 50%;
+      position: absolute;
+      top: 80px;
+      right: 180px;
+      opacity: 0;
+    }
+
+    #scene1.active .notif-dot {
+      animation: notifPulse 1s ease 0.1s forwards;
+    }
+
+    /* ── SCENE 1B: Chat bubble answer ──────────────────── */
+    #scene1b {
+      background: #0D0D0B;
+    }
+
+    #scene1b .bubble-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+      opacity: 0;
+      transform: scale(0.7);
+    }
+
+    #scene1b.active .bubble-container {
+      animation: elasticPop 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s forwards;
+    }
+
+    #scene1b .chat-bubble-icon {
+      width: 100px;
+      height: 100px;
+      background: #C8841A;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 60px rgba(200, 132, 26, 0.4);
+    }
+
+    #scene1b .chat-bubble-icon svg {
+      width: 48px;
+      height: 48px;
+      fill: white;
+    }
+
+    /* ── SCENE 2: Brand Reveal ─────────────────────────── */
+    #scene2 {
+      background: #F5F0E8;
+    }
+
+    #scene2 .logo-text {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 120px;
+      color: #0D0D0B;
+      letter-spacing: -0.04em;
+      opacity: 0;
+      transform: scale(0.6);
+    }
+
+    #scene2 .logo-text span {
+      color: #C8841A;
+    }
+
+    #scene2 .tagline {
+      font-family: 'Inter', sans-serif;
+      font-size: 28px;
+      font-weight: 500;
+      color: #6A6661;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-top: 20px;
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    #scene2.active .logo-text {
+      animation: elasticPop 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s forwards;
+    }
+
+    #scene2.active .tagline {
+      animation: fadeSlideUp 0.7s ease 0.9s forwards;
+    }
+
+    /* ── SCENE 3: Step 01 ──────────────────────────────── */
+    .step-scene {
+      background: #F5F0E8;
+    }
+
+    .step-scene .step-number {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 220px;
+      color: #E4E0D8;
+      opacity: 0;
+      transform: translateX(-80px);
+      line-height: 1;
+    }
+
+    .step-scene .step-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 64px;
+      color: #0D0D0B;
+      letter-spacing: -0.03em;
+      margin-top: -20px;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .step-scene .step-body {
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      font-size: 26px;
+      color: #6A6661;
+      max-width: 700px;
+      text-align: center;
+      line-height: 1.6;
+      margin-top: 24px;
+      opacity: 0;
+      transform: translateY(15px);
+    }
+
+    .step-scene .step-line {
+      width: 120px;
+      height: 4px;
+      background: #0D0D0B;
+      border-radius: 2px;
+      margin-bottom: 32px;
+      opacity: 0;
+      transform: scaleX(0);
+      transform-origin: left;
+    }
+
+    .step-scene.active .step-number {
+      animation: slideFromLeft 0.7s ease 0.2s forwards;
+    }
+
+    .step-scene.active .step-line {
+      animation: lineGrow 0.5s ease 0.5s forwards;
+    }
+
+    .step-scene.active .step-title {
+      animation: fadeSlideUp 0.6s ease 0.6s forwards;
+    }
+
+    .step-scene.active .step-body {
+      animation: fadeSlideUp 0.6s ease 0.9s forwards;
+    }
+
+    /* ── BADGE overlays ────────────────────────────────── */
+    .badge {
+      position: absolute;
+      bottom: 100px;
+      right: 140px;
+      background: #0D0D0B;
+      color: #F5F0E8;
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: 22px;
+      padding: 16px 32px;
+      border-radius: 12px;
+      opacity: 0;
+      transform: translateX(40px);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    }
+
+    .badge .icon {
+      font-size: 26px;
+    }
+
+    .step-scene.active .badge {
+      animation: badgeSlideIn 0.5s ease 1.4s forwards;
+    }
+
+    /* ── SCENE: Proof ──────────────────────────────────── */
+    #scene-proof {
+      background: #0D0D0B;
+    }
+
+    #scene-proof .proof-number {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 140px;
+      color: #C8841A;
+      opacity: 0;
+      transform: scale(0.8);
+    }
+
+    #scene-proof .proof-text {
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      font-size: 32px;
+      color: #A09C96;
+      margin-top: 12px;
+      opacity: 0;
+      transform: translateY(15px);
+    }
+
+    #scene-proof.active .proof-number {
+      animation: elasticPop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s forwards;
+    }
+
+    #scene-proof.active .proof-text {
+      animation: fadeSlideUp 0.6s ease 0.8s forwards;
+    }
+
+    /* ── SCENE: CTA ────────────────────────────────────── */
+    #scene-cta {
+      background: #F5F0E8;
+    }
+
+    #scene-cta .cta-headline {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 56px;
+      color: #0D0D0B;
+      letter-spacing: -0.03em;
+      max-width: 900px;
+      text-align: center;
+      line-height: 1.2;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    #scene-cta .cta-btn {
+      margin-top: 48px;
+      background: #0D0D0B;
+      color: #F5F0E8;
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: 24px;
+      padding: 22px 56px;
+      border-radius: 12px;
+      opacity: 0;
+      transform: scale(0.8);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    }
+
+    #scene-cta .cta-sub {
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      font-size: 18px;
+      color: #B0ABA3;
+      margin-top: 20px;
+      letter-spacing: 0.01em;
+      opacity: 0;
+    }
+
+    #scene-cta.active .cta-headline {
+      animation: fadeSlideUp 0.7s ease 0.3s forwards;
+    }
+
+    #scene-cta.active .cta-btn {
+      animation: elasticPop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 1.0s forwards;
+    }
+
+    #scene-cta.active .cta-sub {
+      animation: fadeSlideUp 0.5s ease 1.5s forwards;
+    }
+
+    /* ── SCENE: Placeholder (for screen recordings) ───── */
+    .placeholder-scene {
+      background: #1A1917;
+      position: relative;
+    }
+
+    .placeholder-scene .rec-indicator {
+      position: absolute;
+      top: 48px;
+      left: 48px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      opacity: 0;
+    }
+
+    .placeholder-scene .rec-dot {
+      width: 14px;
+      height: 14px;
+      background: #E53E3E;
+      border-radius: 50%;
+      animation: recBlink 1.2s ease infinite;
+    }
+
+    .placeholder-scene .rec-label {
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: 18px;
+      color: #E53E3E;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .placeholder-scene .placeholder-msg {
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      font-size: 28px;
+      color: #6A6661;
+      text-align: center;
+      max-width: 700px;
+      line-height: 1.6;
+      opacity: 0;
+    }
+
+    .placeholder-scene .placeholder-hint {
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      font-size: 18px;
+      color: #4A4743;
+      margin-top: 16px;
+      opacity: 0;
+    }
+
+    .placeholder-scene.active .rec-indicator {
+      animation: fadeIn 0.3s ease 0.2s forwards;
+    }
+
+    .placeholder-scene.active .placeholder-msg {
+      animation: fadeIn 0.5s ease 0.3s forwards;
+    }
+
+    .placeholder-scene.active .placeholder-hint {
+      animation: fadeIn 0.5s ease 0.6s forwards;
+    }
+
+    /* ── Split screen label ────────────────────────────── */
+    #scene-split {
+      background: #0D0D0B;
+    }
+
+    #scene-split .split-container {
+      display: flex;
+      gap: 64px;
+      align-items: center;
+      opacity: 0;
+    }
+
+    #scene-split .split-side {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    #scene-split .split-box {
+      width: 540px;
+      height: 400px;
+      border-radius: 16px;
+      border: 2px solid #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      font-size: 22px;
+      color: #555;
+    }
+
+    #scene-split .split-label {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 22px;
+      color: #A09C96;
+    }
+
+    #scene-split .split-headline {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 48px;
+      color: #FFFFFF;
+      margin-bottom: 48px;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    #scene-split.active .split-headline {
+      animation: fadeSlideUp 0.6s ease 0.2s forwards;
+    }
+
+    #scene-split.active .split-container {
+      animation: fadeIn 0.8s ease 0.7s forwards;
+    }
+
+    /* ── Transition overlay ────────────────────────────── */
+    #transition-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 1920px;
+      height: 1080px;
+      background: #0D0D0B;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    #transition-overlay.flash {
+      opacity: 1;
+    }
+
+    /* ── Controls ──────────────────────────────────────── */
+    #controls {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 1920px;
+      background: rgba(0, 0, 0, 0.85);
+      padding: 16px 40px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      z-index: 200;
+      font-family: 'Inter', sans-serif;
+    }
+
+    #controls button {
+      padding: 10px 24px;
+      border-radius: 8px;
+      border: none;
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    #controls .btn-play {
+      background: #C8841A;
+      color: white;
+    }
+
+    #controls .btn-prev,
+    #controls .btn-next {
+      background: #333;
+      color: #ccc;
+    }
+
+    #controls .btn-prev:hover,
+    #controls .btn-next:hover {
+      background: #555;
+    }
+
+    #controls .scene-info {
+      color: #888;
+      font-size: 14px;
+      margin-left: auto;
+    }
+
+    #controls .scene-name {
+      color: #C8841A;
+      font-weight: 600;
+    }
+
+    #controls .hide-hint {
+      color: #555;
+      font-size: 12px;
+    }
+
+    /* ── Keyframes ─────────────────────────────────────── */
+    @keyframes fadeSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideFromLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-80px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes elasticPop {
+      from {
+        opacity: 0;
+        transform: scale(0.6);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes lineGrow {
+      from {
+        opacity: 0;
+        transform: scaleX(0);
+      }
+
+      to {
+        opacity: 1;
+        transform: scaleX(1);
+      }
+    }
+
+    @keyframes badgeSlideIn {
+      from {
+        opacity: 0;
+        transform: translateX(40px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes notifPulse {
+      0% {
+        opacity: 0;
+        transform: scale(0);
+      }
+
+      50% {
+        opacity: 1;
+        transform: scale(1.8);
+      }
+
+      100% {
+        opacity: 0;
+        transform: scale(2.5);
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes recBlink {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.2;
+      }
+    }
+
+    /* ── Hide controls during recording ────────────────── */
+    body.recording #controls {
+      display: none;
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- ═══════════════════════════════════════════════════════ -->
-<!-- SCENE 1: The Hook                                      -->
-<!-- ═══════════════════════════════════════════════════════ -->
-<div id="scene1" class="scene active">
-  <div class="notif-dot"></div>
-  <div class="line1">It's 2am.</div>
-  <div class="line2">A customer just asked a question.</div>
-  <div class="line3">Who's going to answer?</div>
-</div>
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SCENE 1: The Hook                                      -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="scene1" class="scene active">
+    <div class="notif-dot"></div>
+    <div class="line1">It's 2am.</div>
+    <div class="line2">A customer just asked a question.</div>
+    <div class="line3">Who's going to answer?</div>
+  </div>
 
-<!-- ═══════════════════════════════════════════════════════ -->
-<!-- SCENE 1B: Chat Bubble Answer                           -->
-<!-- ═══════════════════════════════════════════════════════ -->
-<div id="scene1b" class="scene">
-  <div class="bubble-container">
-    <div class="chat-bubble-icon">
-      <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SCENE 1B: Chat Bubble Answer                           -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="scene1b" class="scene">
+    <div class="bubble-container">
+      <div class="chat-bubble-icon">
+        <svg viewBox="0 0 24 24">
+          <path
+            d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+        </svg>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- ═══════════════════════════════════════════════════════ -->
-<!-- SCENE 2: Brand Reveal                                  -->
-<!-- ═══════════════════════════════════════════════════════ -->
-<div id="scene2" class="scene">
-  <div class="logo-text">Support<span>OS</span></div>
-  <div class="tagline">AI Customer Support for Startups</div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════ -->
-<!-- SCENE 3a: Step 01 Title Card                           -->
-<!-- ═══════════════════════════════════════════════════════ -->
-<div id="scene3a" class="scene step-scene">
-  <div class="step-number">01</div>
-  <div class="step-line"></div>
-  <div class="step-title">Upload your docs</div>
-  <div class="step-body">Drop in your FAQs, product guides, or any PDF.<br>SupportOS learns your product instantly.</div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════ -->
-<!-- SCENE 3b: [PLACEHOLDER — Record: Upload PDF]           -->
-<!-- ═══════════════════════════════════════════════════════ -->
-<div id="scene3b" class="scene placeholder-scene">
-  <div class="rec-indicator">
-    <div class="rec-dot"></div>
-    <span class="rec-label">Replace with screen recording</span>
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SCENE 2: Brand Reveal                                  -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="scene2" class="scene">
+    <div class="logo-text">Support<span>OS</span></div>
+    <div class="tagline">AI Customer Support for Startups</div>
   </div>
-  <div class="placeholder-msg">📄 Record yourself uploading a PDF<br>in the Settings → Knowledge Base page</div>
-  <div class="placeholder-hint">Navigate to Settings → Upload a PDF → Show it appearing in the list</div>
-  <div class="badge">
-    <span class="icon">✓</span>
-    Knowledge base ready
-  </div>
-</div>
 
-<!-- ═══════════════════════════════════════════════════════ -->
-<!-- SCENE 4a: Step 02 Title Card                           -->
-<!-- ═══════════════════════════════════════════════════════ -->
-<div id="scene4a" class="scene step-scene">
-  <div class="step-number">02</div>
-  <div class="step-line"></div>
-  <div class="step-title">Drop the widget</div>
-  <div class="step-body">One line of code on your site.<br>No engineering sprint required.</div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════ -->
-<!-- SCENE 4b: [PLACEHOLDER — Record: Copy widget snippet]  -->
-<!-- ═══════════════════════════════════════════════════════ -->
-<div id="scene4b" class="scene placeholder-scene">
-  <div class="rec-indicator">
-    <div class="rec-dot"></div>
-    <span class="rec-label">Replace with screen recording</span>
-  </div>
-  <div class="placeholder-msg">🔗 Record yourself copying the widget code<br>and showing it appear on a customer site</div>
-  <div class="placeholder-hint">Settings → Widget Integration → Copy code → Switch to test site → Widget appears</div>
-  <div class="badge" style="background: #C8841A;">
-    <span class="icon">💬</span>
-    1 line of code
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════ -->
-<!-- SCENE 5a: Step 03 Title Card                           -->
-<!-- ═══════════════════════════════════════════════════════ -->
-<div id="scene5a" class="scene step-scene">
-  <div class="step-number">03</div>
-  <div class="step-line"></div>
-  <div class="step-title">AI handles the rest</div>
-  <div class="step-body">Customers get instant answers. Complex issues<br>escalate to your inbox — with full context.</div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════ -->
-<!-- SCENE 5b: [PLACEHOLDER — Record: AI chat demo]         -->
-<!-- ═══════════════════════════════════════════════════════ -->
-<div id="scene5b" class="scene placeholder-scene">
-  <div class="rec-indicator">
-    <div class="rec-dot"></div>
-    <span class="rec-label">Replace with screen recording</span>
-  </div>
-  <div class="placeholder-msg">🤖 Record the AI answering a customer question<br>then escalating to human when asked</div>
-  <div class="placeholder-hint">Open widget → Ask "How do I reset my password?" → AI answers → Ask "talk to a human" → AI escalates</div>
-  <div class="badge">
-    <span class="icon">⚡</span>
-    Answered in 2s
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════ -->
-<!-- SCENE: Split Screen (Escalation)                       -->
-<!-- ═══════════════════════════════════════════════════════ -->
-<div id="scene-split" class="scene" style="background: #0D0D0B;">
-  <div class="split-headline">Your inbox. Full context.</div>
-  <div class="split-container">
-    <div class="split-side">
-      <div class="split-box">← Customer widget (replace)</div>
-      <div class="split-label">What the customer sees</div>
-    </div>
-    <div style="width: 3px; height: 400px; background: #333; border-radius: 2px;"></div>
-    <div class="split-side">
-      <div class="split-box">Dashboard inbox (replace) →</div>
-      <div class="split-label">What you see</div>
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SCENE 3a: Step 01 Title Card                           -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="scene3a" class="scene step-scene">
+    <div class="step-number">01</div>
+    <div class="step-line"></div>
+    <div class="step-title">Upload your docs</div>
+    <div class="step-body">Drop in your FAQs, product guides, or any PDF.<br>SupportOS learns your product instantly.
     </div>
   </div>
-</div>
 
-<!-- ═══════════════════════════════════════════════════════ -->
-<!-- SCENE: Social Proof                                    -->
-<!-- ═══════════════════════════════════════════════════════ -->
-<div id="scene-proof" class="scene">
-  <div class="proof-number">500+</div>
-  <div class="proof-text">tickets handled while you sleep</div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════ -->
-<!-- SCENE: Closing CTA                                     -->
-<!-- ═══════════════════════════════════════════════════════ -->
-<div id="scene-cta" class="scene">
-  <div class="cta-headline">Your support inbox shouldn't<br>be a source of stress.</div>
-  <div class="cta-btn">Start free → supportos.site</div>
-  <div class="cta-sub">No credit card required · Free for first 500 tickets</div>
-</div>
-
-
-<!-- ═══════════════════════════════════════════════════════ -->
-<!-- TRANSITION OVERLAY                                     -->
-<!-- ═══════════════════════════════════════════════════════ -->
-<div id="transition-overlay"></div>
-
-<!-- ═══════════════════════════════════════════════════════ -->
-<!-- CONTROLS (hidden during recording)                     -->
-<!-- ═══════════════════════════════════════════════════════ -->
-<div id="controls">
-  <button class="btn-prev" onclick="prev()">← Prev</button>
-  <button class="btn-play" onclick="autoPlay()">▶ Auto-Play All</button>
-  <button class="btn-next" onclick="next()">Next →</button>
-  <button class="btn-next" onclick="document.body.classList.toggle('recording')">Hide Controls (for recording)</button>
-  <div class="scene-info">
-    Scene <span id="scene-counter" class="scene-name">1</span> / <span id="scene-total"></span>
-    — <span id="scene-label" class="scene-name"></span>
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SCENE 3b: [PLACEHOLDER - Record: Upload PDF]           -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="scene3b" class="scene placeholder-scene">
+    <div class="rec-indicator">
+      <div class="rec-dot"></div>
+      <span class="rec-label">Replace with screen recording</span>
+    </div>
+    <div class="placeholder-msg">📄 Record yourself uploading a PDF<br>in the Settings → Knowledge Base page</div>
+    <div class="placeholder-hint">Navigate to Settings → Upload a PDF → Show it appearing in the list</div>
+    <div class="badge">
+      <span class="icon">✓</span>
+      Knowledge base ready
+    </div>
   </div>
-</div>
 
-<script>
-const scenes = [
-  { id: 'scene1',      name: 'The Hook',              duration: 5000 },
-  { id: 'scene1b',     name: 'Chat Bubble Answer',    duration: 2000 },
-  { id: 'scene2',      name: 'Brand Reveal',          duration: 3500 },
-  { id: 'scene3a',     name: 'Step 01 — Title',       duration: 3000 },
-  { id: 'scene3b',     name: '🔴 RECORD: Upload PDF',  duration: 5000 },
-  { id: 'scene4a',     name: 'Step 02 — Title',       duration: 3000 },
-  { id: 'scene4b',     name: '🔴 RECORD: Widget Code', duration: 5000 },
-  { id: 'scene5a',     name: 'Step 03 — Title',       duration: 3000 },
-  { id: 'scene5b',     name: '🔴 RECORD: AI Chat',    duration: 8000 },
-  { id: 'scene-split', name: 'Split Screen Layout',   duration: 4000 },
-  { id: 'scene-proof', name: 'Social Proof',          duration: 3000 },
-  { id: 'scene-cta',   name: 'Closing CTA',           duration: 5000 },
-];
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SCENE 4a: Step 02 Title Card                           -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="scene4a" class="scene step-scene">
+    <div class="step-number">02</div>
+    <div class="step-line"></div>
+    <div class="step-title">Drop the widget</div>
+    <div class="step-body">One line of code on your site.<br>No engineering sprint required.</div>
+  </div>
 
-let current = 0;
-let playing = false;
-let timer = null;
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SCENE 4b: [PLACEHOLDER - Record: Copy widget snippet]  -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="scene4b" class="scene placeholder-scene">
+    <div class="rec-indicator">
+      <div class="rec-dot"></div>
+      <span class="rec-label">Replace with screen recording</span>
+    </div>
+    <div class="placeholder-msg">🔗 Record yourself copying the widget code<br>and showing it appear on a customer site
+    </div>
+    <div class="placeholder-hint">Settings → Widget Integration → Copy code → Switch to test site → Widget appears</div>
+    <div class="badge" style="background: #C8841A;">
+      <span class="icon">💬</span>
+      1 line of code
+    </div>
+  </div>
 
-document.getElementById('scene-total').textContent = scenes.length;
-updateUI();
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SCENE 5a: Step 03 Title Card                           -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="scene5a" class="scene step-scene">
+    <div class="step-number">03</div>
+    <div class="step-line"></div>
+    <div class="step-title">AI handles the rest</div>
+    <div class="step-body">Customers get instant answers. Complex issues<br>escalate to your inbox - with full context.
+    </div>
+  </div>
 
-function goTo(index) {
-  // Remove active from all
-  scenes.forEach(s => document.getElementById(s.id).classList.remove('active'));
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SCENE 5b: [PLACEHOLDER - Record: AI chat demo]         -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="scene5b" class="scene placeholder-scene">
+    <div class="rec-indicator">
+      <div class="rec-dot"></div>
+      <span class="rec-label">Replace with screen recording</span>
+    </div>
+    <div class="placeholder-msg">🤖 Record the AI answering a customer question<br>then escalating to human when asked
+    </div>
+    <div class="placeholder-hint">Open widget → Ask "How do I reset my password?" → AI answers → Ask "talk to a human" →
+      AI escalates</div>
+    <div class="badge">
+      <span class="icon">⚡</span>
+      Answered in 2s
+    </div>
+  </div>
 
-  // Flash transition
-  const overlay = document.getElementById('transition-overlay');
-  overlay.classList.add('flash');
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SCENE: Split Screen (Escalation)                       -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="scene-split" class="scene" style="background: #0D0D0B;">
+    <div class="split-headline">Your inbox. Full context.</div>
+    <div class="split-container">
+      <div class="split-side">
+        <div class="split-box">← Customer widget (replace)</div>
+        <div class="split-label">What the customer sees</div>
+      </div>
+      <div style="width: 3px; height: 400px; background: #333; border-radius: 2px;"></div>
+      <div class="split-side">
+        <div class="split-box">Dashboard inbox (replace) →</div>
+        <div class="split-label">What you see</div>
+      </div>
+    </div>
+  </div>
 
-  setTimeout(() => {
-    current = index;
-    document.getElementById(scenes[current].id).classList.add('active');
-    overlay.classList.remove('flash');
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SCENE: Social Proof                                    -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="scene-proof" class="scene">
+    <div class="proof-number">500+</div>
+    <div class="proof-text">tickets handled while you sleep</div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SCENE: Closing CTA                                     -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="scene-cta" class="scene">
+    <div class="cta-headline">Your support inbox shouldn't<br>be a source of stress.</div>
+    <div class="cta-btn">Start free supportos.site</div>
+    <div class="cta-sub">No credit card required · Free for first 500 tickets</div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- TRANSITION OVERLAY                                     -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="transition-overlay"></div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- CONTROLS (hidden during recording)                     -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="controls">
+    <button class="btn-prev" onclick="prev()">Prev</button>
+    <button class="btn-play" onclick="autoPlay()">Auto-Play All</button>
+    <button class="btn-next" onclick="next()">Next</button>
+    <button class="btn-next" onclick="document.body.classList.toggle('recording')">Hide Controls (for
+      recording)</button>
+    <div class="scene-info">
+      Scene <span id="scene-counter" class="scene-name">1</span> / <span id="scene-total"></span>
+      - <span id="scene-label" class="scene-name"></span>
+    </div>
+  </div>
+
+  <script>
+    const scenes = [
+      { id: 'scene1', name: 'The Hook', duration: 5000 },
+      { id: 'scene1b', name: 'Chat Bubble Answer', duration: 2000 },
+      { id: 'scene2', name: 'Brand Reveal', duration: 3500 },
+      { id: 'scene3a', name: 'Step 01 - Title', duration: 3000 },
+      { id: 'scene3b', name: '🔴 RECORD: Upload PDF', duration: 5000 },
+      { id: 'scene4a', name: 'Step 02 - Title', duration: 3000 },
+      { id: 'scene4b', name: '🔴 RECORD: Widget Code', duration: 5000 },
+      { id: 'scene5a', name: 'Step 03 - Title', duration: 3000 },
+      { id: 'scene5b', name: '🔴 RECORD: AI Chat', duration: 8000 },
+      { id: 'scene-split', name: 'Split Screen Layout', duration: 4000 },
+      { id: 'scene-proof', name: 'Social Proof', duration: 3000 },
+      { id: 'scene-cta', name: 'Closing CTA', duration: 5000 },
+    ];
+
+    let current = 0;
+    let playing = false;
+    let timer = null;
+
+    document.getElementById('scene-total').textContent = scenes.length;
     updateUI();
-  }, 300);
-}
 
-function next() {
-  if (current < scenes.length - 1) goTo(current + 1);
-}
+    function goTo(index) {
+      // Remove active from all
+      scenes.forEach(s => document.getElementById(s.id).classList.remove('active'));
 
-function prev() {
-  if (current > 0) goTo(current - 1);
-}
+      // Flash transition
+      const overlay = document.getElementById('transition-overlay');
+      overlay.classList.add('flash');
 
-function updateUI() {
-  document.getElementById('scene-counter').textContent = current + 1;
-  document.getElementById('scene-label').textContent = scenes[current].name;
-}
-
-function autoPlay() {
-  if (playing) {
-    clearTimeout(timer);
-    playing = false;
-    document.querySelector('.btn-play').textContent = '▶ Auto-Play All';
-    return;
-  }
-
-  playing = true;
-  document.querySelector('.btn-play').textContent = '⏸ Pause';
-  goTo(0);
-  playNext();
-}
-
-function playNext() {
-  if (!playing) return;
-  timer = setTimeout(() => {
-    if (current < scenes.length - 1) {
-      next();
-      playNext();
-    } else {
-      playing = false;
-      document.querySelector('.btn-play').textContent = '▶ Auto-Play All';
+      setTimeout(() => {
+        current = index;
+        document.getElementById(scenes[current].id).classList.add('active');
+        overlay.classList.remove('flash');
+        updateUI();
+      }, 300);
     }
-  }, scenes[current].duration);
-}
 
-// Keyboard shortcuts
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'ArrowRight') next();
-  if (e.key === 'ArrowLeft') prev();
-  if (e.key === ' ') { e.preventDefault(); autoPlay(); }
-  if (e.key === 'h') document.body.classList.toggle('recording');
-});
-</script>
+    function next() {
+      if (current < scenes.length - 1) goTo(current + 1);
+    }
+
+    function prev() {
+      if (current > 0) goTo(current - 1);
+    }
+
+    function updateUI() {
+      document.getElementById('scene-counter').textContent = current + 1;
+      document.getElementById('scene-label').textContent = scenes[current].name;
+    }
+
+    function autoPlay() {
+      if (playing) {
+        clearTimeout(timer);
+        playing = false;
+        document.querySelector('.btn-play').textContent = '▶ Auto-Play All';
+        return;
+      }
+
+      playing = true;
+      document.querySelector('.btn-play').textContent = '⏸ Pause';
+      goTo(0);
+      playNext();
+    }
+
+    function playNext() {
+      if (!playing) return;
+      timer = setTimeout(() => {
+        if (current < scenes.length - 1) {
+          next();
+          playNext();
+        } else {
+          playing = false;
+          document.querySelector('.btn-play').textContent = '▶ Auto-Play All';
+        }
+      }, scenes[current].duration);
+    }
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') next();
+      if (e.key === 'ArrowLeft') prev();
+      if (e.key === ' ') { e.preventDefault(); autoPlay(); }
+      if (e.key === 'h') document.body.classList.toggle('recording');
+    });
+  </script>
 
 </body>
+
 </html>

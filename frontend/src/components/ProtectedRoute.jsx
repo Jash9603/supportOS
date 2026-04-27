@@ -1,6 +1,6 @@
 // components/ProtectedRoute.jsx
 // Wraps any route that requires login.
-// On mount, calls GET /auth/me — if the cookie is valid, the user passes through.
+// On mount, calls GET /auth/me - if the cookie is valid, the user passes through.
 // If not authenticated (401), redirects to /login.
 
 import { useEffect, useState } from 'react'

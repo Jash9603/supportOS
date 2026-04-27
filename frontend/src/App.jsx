@@ -1,8 +1,8 @@
-// App.jsx — Route definitions
+// App.jsx - Route definitions
 // / → Landing page (public)
 // /login → Login form (public)
 // /signup → Signup form (public)
-// /dashboard/* → Protected (requires auth cookie) — built in Phase 2+
+// /dashboard/* → Protected (requires auth cookie) - built in Phase 2+
 
 import { Routes, Route, Navigate } from 'react-router-dom'
 import Landing from './pages/Landing'

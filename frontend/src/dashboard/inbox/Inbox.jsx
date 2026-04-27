@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------
-// dashboard/inbox/Inbox.jsx — 3-Panel Inbox Screen
+// dashboard/inbox/Inbox.jsx - 3-Panel Inbox Screen
 // -----------------------------------------------------------------------------
 //
 // LAYOUT:
@@ -38,7 +38,7 @@ export default function Inbox({ user }) {
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
 
-  // Real-time hook — fires whenever a new ticket/message event comes in
+  // Real-time hook - fires whenever a new ticket/message event comes in
   const { lastEvent } = useInboxSocket(user?.org_id)
 
   // ── Fetch ALL tickets (for counter badges) ────────────────────────────

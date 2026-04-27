@@ -1,19 +1,19 @@
 # -----------------------------------------------------------------------------
-# agents/graphs/support_agent.py — LangGraph RAG Support Agent
+# agents/graphs/support_agent.py - LangGraph RAG Support Agent
 # -----------------------------------------------------------------------------
 #
 # WHAT IS THIS?
 #   The AI brain of SupportOS. A LangGraph state machine with 3 nodes:
 #
 #   ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-#   │  RETRIEVER  │────▶│  ESCALATION │──?──▶│  RESPONDER  │
+#   │  RETRIEVER  │────>│  ESCALATION │──?──>│  RESPONDER  │
 #   │             │     │   CHECK     │     │             │
 #   │ Search KB   │     │ Should we   │     │ GPT-4o-mini │
 #   │ in Qdrant   │     │ hand off to │     │ generates   │
 #   │             │     │ a human?    │     │ the answer  │
 #   └─────────────┘     └──────┬──────┘     └─────────────┘
 #                              │ YES
-#                              ▼
+#                              v
 #                         ┌─────────┐
 #                         │   END   │
 #                         │ (escalated=True)
@@ -23,15 +23,15 @@
 #   1. Customer asks: "What is your refund policy?"
 #   2. RETRIEVER: searches the org's uploaded docs for relevant chunks
 #   3. ESCALATION CHECK: Did we find good results? Did the customer ask for a human?
-#      - If yes → skip the bot, route to human agent immediately
-#      - If no  → continue to RESPONDER
+#      - If yes - skip the bot, route to human agent immediately
+#      - If no  - continue to RESPONDER
 #   4. RESPONDER: feeds the chunks + question to GPT-4o-mini, generates an answer
-#   5. The answer flows back to the WebSocket → customer sees it in the widget
+#   5. The answer flows back to the WebSocket - customer sees it in the widget
 #
 # LANGSMITH TRACING:
 #   Every node execution, LLM call, and state transition is automatically
 #   traced because we set LANGCHAIN_TRACING_V2=true in agents/__init__.py.
-#   View traces at: https://smith.langchain.com → project "supportos-prod"
+#   View traces at: https://smith.langchain.com - project "supportos-prod"
 # -----------------------------------------------------------------------------
 
 from langgraph.graph import StateGraph, END
@@ -116,7 +116,7 @@ def escalation_check_node(state: SupportState) -> dict:
             "response": "I'm having trouble finding the right answer. Let me connect you with a human agent who can help.",
         }
 
-    # No escalation needed — let the bot try to answer
+    # No escalation needed - let the bot try to answer
     return {"needs_escalation": False}
 
 
@@ -156,7 +156,7 @@ async def responder_node(state: SupportState) -> dict:
 
     answer = result.content
 
-    # Detect fallback — if the bot said "I don't know", escalate immediately
+    # Detect fallback - if the bot said "I don't know", escalate immediately
     if FALLBACK_INDICATOR.lower() in answer.lower():
         return {
             "response": answer,
@@ -164,7 +164,7 @@ async def responder_node(state: SupportState) -> dict:
             "needs_escalation": True,  # Auto-escalate on first failure
         }
 
-    # Success — reset failure counter
+    # Success - reset failure counter
     return {
         "response": answer,
         "bot_failure_count": 0,
@@ -187,8 +187,8 @@ def build_support_graph():
     Compile the LangGraph state machine.
 
     Flow:
-      START → retriever → escalation_check →  (if escalate) → END
-                                            →  (else) → responder → END
+      START -> retriever -> escalation_check ->  (if escalate) -> END
+                                             ->  (else) -> responder -> END
     """
     graph = StateGraph(SupportState)
 
@@ -208,7 +208,7 @@ def build_support_graph():
         "escalation_check",
         should_escalate,
         {
-            "end": END,          # Escalated → stop here
+            "end": END,          # Escalated - stop here
             "responder": "responder",  # Bot answers
         }
     )

@@ -1,6 +1,6 @@
 ## backend/
 
-FastAPI Python service — all API endpoints, DB models, services, workers.
+FastAPI Python service - all API endpoints, DB models, services, workers.
 
 **Start:**
 ```bash

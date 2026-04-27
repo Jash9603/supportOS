@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# config.py — App Settings / Environment Variables
+# config.py - App Settings / Environment Variables
 # -----------------------------------------------------------------------------
 # This file reads all the secret values from the .env file (like database URL,
 # API keys, allowed websites for CORS etc.) and makes them available everywhere
@@ -10,7 +10,7 @@
 #   print(settings.DATABASE_URL)
 # -----------------------------------------------------------------------------
 
-# No 'from typing import list' needed — list[str] is a native built-in in Python 3.11+
+# No 'from typing import list' needed - list[str] is a native built-in in Python 3.11+
 from pydantic_settings import BaseSettings
 
 
@@ -36,7 +36,7 @@ class Settings(BaseSettings):
     FRONTEND_URL: str = "http://localhost:5173"
     BACKEND_URL: str = "http://localhost:8000"
 
-    # CORS — comma-separated origins
+    # CORS - comma-separated origins
     ALLOWED_ORIGINS: str = "http://localhost:5173,https://support-os-omega.vercel.app"
 
     # LangSmith (optional)

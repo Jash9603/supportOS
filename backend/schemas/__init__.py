@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# schemas/__init__.py — Schemas Package
+# schemas/__init__.py - Schemas Package
 # -----------------------------------------------------------------------------
 # Just marks this folder as a Python package so we can do:
 #   from schemas.auth import SignupRequest

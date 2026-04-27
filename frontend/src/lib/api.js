@@ -1,4 +1,4 @@
-// lib/api.js — Axios API Client
+// lib/api.js - Axios API Client
 // All API calls go through this single instance.
 // withCredentials: true → browser automatically sends the httpOnly auth cookie
 // on every request, so we never touch tokens manually in JS.

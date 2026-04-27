@@ -1,7 +1,7 @@
 // components/layout/Navbar.jsx
 // Shared top navigation bar used on all public pages.
 // Props:
-//   transparent (bool) — removes border / background for auth pages
+//   transparent (bool) - removes border / background for auth pages
 
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -57,7 +57,7 @@ export default function Navbar({ transparent = false }) {
           className="btn-primary"
           style={{ padding: '8px 18px', fontSize: '0.82rem' }}
         >
-          Get Started →
+          Get Started
         </Link>
       </div>
 
@@ -95,7 +95,7 @@ export default function Navbar({ transparent = false }) {
             style={{ width: '100%', textAlign: 'center', padding: '10px 18px', fontSize: '0.9rem' }}
             onClick={() => setMenuOpen(false)}
           >
-            Get Started →
+            Get Started
           </Link>
         </div>
       )}

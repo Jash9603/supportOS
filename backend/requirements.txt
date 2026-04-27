@@ -33,7 +33,7 @@ langchain==0.3.14
 langgraph==0.2.74
 langchain-openai==0.2.14
 langsmith==0.1.147
-# langgraph-checkpoint-redis removed — incompatible with langgraph 0.2.74
+# langgraph-checkpoint-redis removed - incompatible with langgraph 0.2.74
 # and Upstash doesn't support Redis Stack modules it requires anyway.
 # Using MemorySaver instead (see agents/graphs/support_agent.py)
 

@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------
-// dashboard/DashboardLayout.jsx — App Shell (Sidebar + Top Nav + Content)
+// dashboard/DashboardLayout.jsx - App Shell (Sidebar + Top Nav + Content)
 // -----------------------------------------------------------------------------
 //
 // WHAT IS THIS?
@@ -86,7 +86,7 @@ const icons = {
 }
 
 // ── Navigation items config ─────────────────────────────────────────────────
-// Adding a new page? Just add it here — the sidebar builds itself from this.
+// Adding a new page? Just add it here - the sidebar builds itself from this.
 const navItems = [
   { to: '/dashboard/overview',  label: 'Overview',  icon: icons.overview },
   { to: '/dashboard/inbox',     label: 'Inbox',     icon: icons.inbox },
@@ -143,7 +143,7 @@ export default function DashboardLayout() {
         setNotifications(res.data.notifications || [])
         setUnreadCount(res.data.unread_count || 0)
       })
-      .catch(() => {}) // Silently fail — notifications are non-critical
+      .catch(() => {}) // Silently fail - notifications are non-critical
   }, [])
 
   // Listen for real-time notification events from WS

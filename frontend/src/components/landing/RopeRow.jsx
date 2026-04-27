@@ -8,7 +8,7 @@ export default function RopeRow({ tickets }) {
   return (
     <div style={{ position: 'relative', width: '100%', flex: 1, minHeight: 0 }}>
 
-      {/* Rope SVG — catenary curve, anchor pins at both ends.
+      {/* Rope SVG - catenary curve, anchor pins at both ends.
           Hidden on mobile via CSS class since the marquee scrolls horizontally. */}
       <svg
         className="rope-svg"

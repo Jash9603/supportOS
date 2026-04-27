@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# routers/contact.py — Contact Form Endpoint
+# routers/contact.py - Contact Form Endpoint
 # -----------------------------------------------------------------------------
 #
 # Simple public endpoint that receives contact form submissions from the
@@ -87,8 +87,8 @@ Reply directly to this email to respond to {form.name}.
 
         except Exception as e:
             logger.error(f"❌ Failed to send contact email: {e}")
-            # Don't fail the request — the message is still logged
+            # Don't fail the request - the message is still logged
             return {"status": "logged", "message": "Thank you! Your message has been received."}
     else:
-        logger.warning("⚠️  SMTP not configured — contact form submission logged only")
+        logger.warning("⚠️  SMTP not configured - contact form submission logged only")
         return {"status": "logged", "message": "Thank you! Your message has been received."}

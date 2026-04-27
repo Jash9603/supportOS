@@ -1,4 +1,4 @@
-# routers/settings.py — Profile & Organisation Settings API
+# routers/settings.py - Profile & Organisation Settings API
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession

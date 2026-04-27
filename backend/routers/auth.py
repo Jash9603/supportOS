@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# routers/auth.py — Authentication Endpoints
+# routers/auth.py - Authentication Endpoints
 # -----------------------------------------------------------------------------
 # This file handles everything related to user identity:
 #
@@ -44,7 +44,7 @@ from services.auth_service import (
 #
 # Fix: ALWAYS run verify_password, even against a fake hash.
 # This makes all login attempts take the same amount of time.
-# Computed once at module import time — NOT inside the login function.
+# Computed once at module import time - NOT inside the login function.
 # -----------------------------------------------------------------------------
 _DUMMY_HASH = hash_password("dummy-timing-shield")
 
@@ -56,12 +56,12 @@ router = APIRouter()
 def _set_auth_cookie(response: Response, token: str) -> None:
     """
     Attach the JWT as an httpOnly cookie to the response.
-    Called from both signup and login — keeps cookie settings in one place.
+    Called from both signup and login - keeps cookie settings in one place.
     """
     response.set_cookie(
         key="access_token",
         value=token,
-        httponly=True,       # JS cannot read this cookie — XSS safe
+        httponly=True,       # JS cannot read this cookie - XSS safe
         secure=True,         # Required for cross-site cookies
         samesite="none",     # Required for cross-origin (Frontend apart from Backend)
         max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
@@ -103,7 +103,7 @@ async def signup(
       2. Create org + user in the DB (in one transaction)
       3. Create JWT with user info embedded
       4. Set it as an httpOnly cookie in the response
-      5. Return UserResponse (safe user info — no password)
+      5. Return UserResponse (safe user info - no password)
     """
     # 1. Prevent duplicate email
     existing = await get_user_by_email(db, body.email)
@@ -122,7 +122,7 @@ async def signup(
         org_name=body.org_name,
     )
 
-    # 3. Create JWT — embed user_id, org_id, role so routes have context
+    # 3. Create JWT - embed user_id, org_id, role so routes have context
     token = create_access_token({
         "sub": str(user.id),
         "org_id": str(org.id),
@@ -148,14 +148,14 @@ async def login(
     Login with email + password.
 
     We deliberately return the same vague error for "wrong email" and "wrong password"
-    — this prevents attackers from knowing which emails are registered.
+    - this prevents attackers from knowing which emails are registered.
     """
     # Look up user by email first
     user = await get_user_by_email(db, body.email)
 
     # Always run verify_password regardless of whether the user exists.
     # Python's `or` short-circuits: `not user or not verify_password(...)` skips
-    # verify_password when user is None — making non-existent email responses
+    # verify_password when user is None - making non-existent email responses
     # measurably faster and leaking which emails are registered.
     # Using _DUMMY_HASH ensures bcrypt always runs for ~100ms on every attempt.
     password_ok = verify_password(

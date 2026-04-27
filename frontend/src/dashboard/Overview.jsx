@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------
-// Overview.jsx — The Founder's Command Center
+// Overview.jsx - The Founder's Command Center
 // -----------------------------------------------------------------------------
 //
 // WHAT IS THIS PAGE?
@@ -171,7 +171,7 @@ export default function Overview() {
                 {recent_tickets.length === 0 ? (
                   <tr>
                     <td colSpan={4} style={{ ...styles.td, textAlign: 'center', color: '#94A3B8', padding: 32 }}>
-                      No tickets yet — they'll appear here once customers start chatting.
+                      No tickets yet. They'll appear here once customers start chatting.
                     </td>
                   </tr>
                 ) : (
@@ -289,7 +289,7 @@ function ErrorState({ message }) {
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 function formatResponseTime(mins) {
-  if (!mins || mins === 0) return '—'
+  if (!mins || mins === 0) return '-'
   if (mins < 1) return `${Math.round(mins * 60)}s`
   if (mins < 60) return `${Math.round(mins)}m`
   const h = Math.floor(mins / 60)

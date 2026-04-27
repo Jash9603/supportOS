@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# schemas/analytics.py — Response Models for the Analytics API
+# schemas/analytics.py - Response Models for the Analytics API
 # -----------------------------------------------------------------------------
 
 from pydantic import BaseModel

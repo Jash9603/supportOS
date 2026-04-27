@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# models/organisation.py — Organisation Table
+# models/organisation.py - Organisation Table
 # -----------------------------------------------------------------------------
 # An "organisation" is the company/startup that signed up for SupportOS.
 # Every piece of data in the app (users, tickets, KB docs) is owned by an org.

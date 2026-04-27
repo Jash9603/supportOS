@@ -1,6 +1,6 @@
 // components/landing/ContactSection.jsx
 // Contact form section at the bottom of the landing page.
-// Sends form data to POST /contact/submit — email notification to the team.
+// Sends form data to POST /contact/submit - email notification to the team.
 
 import { useState } from 'react'
 
@@ -155,7 +155,7 @@ export default function ContactSection() {
                     Sending...
                   </span>
                 ) : (
-                  'Send Message →'
+                  'Send Message'
                 )}
               </button>
             </form>

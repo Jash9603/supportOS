@@ -1,9 +1,18 @@
 // components/landing/HeroSection.jsx
 // Screen 1 (100vh): Large headline, subtitle, CTA buttons, animated scroll hint.
 
+import { useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
 export default function HeroSection() {
+  const [isMuted, setIsMuted] = useState(true)
+  const videoRef = useRef(null)
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.volume = 0.5 // Force 50% volume for the music
+    }
+  }, [])
   return (
     <section
       style={{
@@ -58,11 +67,11 @@ export default function HeroSection() {
         </p>
 
         <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-          <Link to="/signup" className="btn-primary">Start for free →</Link>
+          <Link to="/signup" className="btn-primary">Start for free</Link>
           <Link to="/login" className="btn-outline">I have an account</Link>
         </div>
 
-        {/* Micro-copy — removes pre-click objection */}
+        {/* Micro-copy - removes pre-click objection */}
         <p style={{
           fontFamily: 'Inter, sans-serif',
           fontSize: '0.72rem',
@@ -94,14 +103,44 @@ export default function HeroSection() {
             <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#ffbd2e' }} />
             <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#27c93f' }} />
           </div>
-          <video
-            src={import.meta.env.VITE_HERO_VIDEO_URL || `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/static/demo.mp4`}
-            autoPlay
-            loop
-            muted
-            playsInline
-            style={{ width: '100%', display: 'block' }}
-          />
+          <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9' }}>
+            <video
+              ref={videoRef}
+              src={import.meta.env.VITE_HERO_VIDEO_URL || `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/static/demo.mp4`}
+              autoPlay
+              loop
+              muted={isMuted}
+              playsInline
+              style={{ width: '100%', height: '100%', display: 'block', objectFit: 'cover' }}
+            />
+            {isMuted && (
+              <button 
+                onClick={() => setIsMuted(false)}
+                style={{
+                  position: 'absolute',
+                  bottom: 16,
+                  right: 16,
+                  background: 'rgba(0,0,0,0.6)',
+                  color: 'white',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  borderRadius: 20,
+                  padding: '8px 16px',
+                  fontSize: '0.85rem',
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  backdropFilter: 'blur(4px)',
+                  transition: 'background 0.2s',
+                  zIndex: 10
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                Click to Unmute
+              </button>
+            )}
+          </div>
         </div>
       </div>
 

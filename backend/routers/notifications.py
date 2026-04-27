@@ -1,11 +1,11 @@
 # -----------------------------------------------------------------------------
-# routers/notifications.py — In-app Notification Endpoints
+# routers/notifications.py - In-app Notification Endpoints
 # -----------------------------------------------------------------------------
 #
 # THREE ENDPOINTS:
-#   GET  /notifications           — Fetch recent notifications for the user's org
-#   PATCH /notifications/{id}/read — Mark one notification as read
-#   PATCH /notifications/read-all  — Mark all unread notifications as read
+#   GET  /notifications           - Fetch recent notifications for the user's org
+#   PATCH /notifications/{id}/read - Mark one notification as read
+#   PATCH /notifications/read-all  - Mark all unread notifications as read
 # -----------------------------------------------------------------------------
 
 import uuid

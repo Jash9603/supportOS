@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   index.css — Global Design System
+   index.css - Global Design System
    Editorial aesthetic: cream background, bold ink typography, amber accents.
    All CSS tokens, texture, animations, and base styles live here.
    ───────────────────────────────────────────────────────────────────────────── */
@@ -30,7 +30,7 @@
 
 body {
   background-color: var(--cream);
-  /* Dot grid — more spaced and editorial than fine diagonal lines */
+  /* Dot grid - more spaced and editorial than fine diagonal lines */
   background-image: radial-gradient(circle, rgba(0, 0, 0, 0.13) 1.5px, transparent 1.5px);
   background-size: 48px 48px;
   color: var(--ink);
@@ -227,36 +227,32 @@ body {
 .card-flip-outer {
   perspective: 900px;
   cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .card-flip-inner {
   position: relative;
   transform-style: preserve-3d;
-  /* Smooth, physical-feeling flip — accelerates fast, eases to rest */
+  /* Smooth, physical-feeling flip - accelerates fast, eases to rest */
   transition: transform 0.55s cubic-bezier(0.45, 0, 0.15, 1);
+  display: grid;
 }
 
 .card-flip-outer:hover .card-flip-inner {
   transform: rotateY(180deg);
 }
 
-/* On touch/mobile devices, disable the hover flip (it gets stuck or ruins the UX) */
-@media (hover: none) and (pointer: coarse) {
-  .card-flip-outer:hover .card-flip-inner {
-    transform: none;
-  }
-}
+
 
 .card-face {
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
+  grid-area: 1 / 1 / 2 / 2;
+  height: 100%;
 }
 
 .card-face-back {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
   transform: rotateY(180deg);
 }
 
@@ -403,7 +399,7 @@ body {
   flex-shrink: 0;
 }
 
-/* Hamburger button — hidden on desktop */
+/* Hamburger button - hidden on desktop */
 .hamburger-btn {
   display: none;
   background: none;
@@ -414,7 +410,7 @@ body {
   align-items: center;
 }
 
-/* Sidebar close button — hidden on desktop */
+/* Sidebar close button - hidden on desktop */
 .sidebar-close-btn {
   display: none;
   background: none;
@@ -425,12 +421,12 @@ body {
   align-items: center;
 }
 
-/* Sidebar overlay — hidden on desktop */
+/* Sidebar overlay - hidden on desktop */
 .sidebar-overlay {
   display: none;
 }
 
-/* ── Landing Navbar mobile toggle — hidden on desktop ─────────────────────── */
+/* ── Landing Navbar mobile toggle - hidden on desktop ─────────────────────── */
 .navbar-mobile-toggle {
   display: none;
   background: none;

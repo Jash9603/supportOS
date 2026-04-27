@@ -136,7 +136,7 @@ async def add_message(db: AsyncSession, redis_client, ticket: Ticket, sender_typ
     await db.commit()
     await db.refresh(new_message)
     
-    # 1. Publish to the customer's widget session — but ONLY for agent/bot replies.
+    # 1. Publish to the customer's widget session - but ONLY for agent/bot replies.
     #    The customer already sees their own message instantly (optimistic rendering).
     #    skip_ws_publish=True when the bot already streamed tokens directly over WebSocket.
     if ticket.session_id and sender_type != "user" and not skip_ws_publish:

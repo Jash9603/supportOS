@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# main.py — App Entry Point
+# main.py - App Entry Point
 # -----------------------------------------------------------------------------
 # This is the heart of the backend. It:
 #
@@ -11,7 +11,7 @@
 # When you run `uvicorn main:app --reload`, Python starts here.
 #
 # Routers are imported and registered here. During early development, routers
-# that don't exist yet are commented out — uncomment as each piece is built.
+# that don't exist yet are commented out - uncomment as each piece is built.
 # -----------------------------------------------------------------------------
 
 from contextlib import asynccontextmanager
@@ -24,7 +24,7 @@ from core.config import settings
 from core.redis import close_redis
 
 # ── Router imports ────────────────────────────────────
-# Comment out routers that don't exist yet — uncomment as each piece is built.
+# Comment out routers that don't exist yet - uncomment as each piece is built.
 from routers import auth
 from routers import tickets       # Piece 2.2
 from routers import widget        # Piece 2.3
@@ -55,7 +55,7 @@ app = FastAPI(
 )
 
 # ── CORS ──────────────────────────────────────────────
-# Origins read from ALLOWED_ORIGINS env var — never hardcoded.
+# Origins read from ALLOWED_ORIGINS env var - never hardcoded.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.origins_list,

@@ -94,7 +94,7 @@ export default function WidgetChat() {
             }
 
             case 'token':
-              // Streaming bot token — append to last bot bubble or create one
+              // Streaming bot token - append to last bot bubble or create one
               setMessages(prev => {
                 const last = prev[prev.length - 1]
                 if (last && last.sender === 'bot' && last.streaming) {
@@ -244,7 +244,7 @@ export default function WidgetChat() {
           )
         })}
 
-        {/* Typing indicator — engaging animation while AI thinks */}
+        {/* Typing indicator - engaging animation while AI thinks */}
         {statusText && (
           <div style={styles.typingWrap}>
             <div style={styles.botAvatar}>AI</div>

@@ -1,10 +1,10 @@
 # -----------------------------------------------------------------------------
-# models/notification.py — In-app Notification Model
+# models/notification.py - In-app Notification Model
 # -----------------------------------------------------------------------------
 #
 # Stores notifications for dashboard users (new ticket, new message, escalation).
 # Each notification is tied to an org and optionally to a specific ticket.
-# Persists across page refreshes — the frontend fetches on mount and then
+# Persists across page refreshes - the frontend fetches on mount and then
 # receives real-time updates via the existing inbox WebSocket.
 # -----------------------------------------------------------------------------
 
@@ -26,7 +26,7 @@ class Notification(Base):
     org_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("organisations.id"), nullable=False, index=True
     )
-    # nullable — if null, it's an org-wide notification visible to all members
+    # nullable - if null, it's an org-wide notification visible to all members
     user_id: Mapped[Optional[uuid.UUID]] = mapped_column(
         UUID(as_uuid=True), ForeignKey("users.id"), nullable=True
     )

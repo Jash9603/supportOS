@@ -1,8 +1,8 @@
 # -----------------------------------------------------------------------------
-# services/auth_service.py — Auth Business Logic
+# services/auth_service.py - Auth Business Logic
 # -----------------------------------------------------------------------------
 # This file handles all the database work for authentication.
-# The router (auth.py) calls these functions — keeping routes thin and logic here.
+# The router (auth.py) calls these functions - keeping routes thin and logic here.
 #
 # Functions:
 #   get_user_by_email()     → look up a user by email address
@@ -31,7 +31,7 @@ async def get_user_by_email(db: AsyncSession, email: str) -> User | None:
 
 
 async def get_user_by_id(db: AsyncSession, user_id: uuid.UUID) -> User | None:
-    """Look up a user by their UUID — used by the /me endpoint via the cookie token."""
+    """Look up a user by their UUID - used by the /me endpoint via the cookie token."""
     result = await db.execute(select(User).where(User.id == user_id))
     return result.scalar_one_or_none()
 
@@ -84,7 +84,7 @@ async def create_org_and_user(
     org_name: str,
 ) -> tuple[Organisation, User]:
     """
-    Sign up flow — creates organisation + owner user in a single DB transaction.
+    Sign up flow - creates organisation + owner user in a single DB transaction.
 
     Steps:
       1. Generate unique slug from org_name
@@ -92,7 +92,7 @@ async def create_org_and_user(
       3. Create User record (role="owner") with hashed password
       4. Commit both together (if either fails, both are rolled back)
 
-    Returns (org, user) — both freshly created.
+    Returns (org, user) - both freshly created.
     """
     slug = await generate_unique_slug(db, org_name)
 

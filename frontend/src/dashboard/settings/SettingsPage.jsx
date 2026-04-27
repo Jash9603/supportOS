@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------
-// dashboard/settings/SettingsPage.jsx — Profile & Integration Settings
+// dashboard/settings/SettingsPage.jsx - Profile & Integration Settings
 // -----------------------------------------------------------------------------
 
 import { useState, useEffect } from 'react'

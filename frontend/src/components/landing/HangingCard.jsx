@@ -4,8 +4,8 @@
 // Hover → card flips 180° (Y-axis) to reveal the AI response back.
 //
 // Two back-card states:
-//   type='resolved'  → green bg, "✓ Answered by AI" — steps or doc link
-//   type='escalated' → amber bg, "↗ Connecting with Agent" — warm handoff
+//   type='resolved'  → green bg, "✓ Answered by AI" - steps or doc link
+//   type='escalated' → amber bg, "↗ Connecting with Agent" - warm handoff
 
 export default function HangingCard({
   initials, bg, badge, name, time, msg,
@@ -27,7 +27,7 @@ export default function HangingCard({
 
   return (
     <div style={{ flexShrink: 0 }}>
-      {/* Rotated hanger unit — pin + string + flip card */}
+      {/* Rotated hanger unit - pin + string + flip card */}
       <div
         style={{
           display: 'flex',
@@ -54,7 +54,7 @@ export default function HangingCard({
         <div className="card-flip-outer" style={{ width: 168 }}>
           <div className="card-flip-inner">
 
-            {/* ── FRONT — customer complaint ─────────────────────────── */}
+            {/* ── FRONT - customer complaint ─────────────────────────── */}
             <div
               className="card-face card-face-front"
               style={{
@@ -109,7 +109,7 @@ export default function HangingCard({
               </p>
             </div>
 
-            {/* ── BACK — AI response ────────────────────────────────── */}
+            {/* ── BACK - AI response ────────────────────────────────── */}
             <div
               className="card-face card-face-back"
               style={{
@@ -144,6 +144,10 @@ export default function HangingCard({
               <p style={{
                 fontFamily: 'Inter, sans-serif', fontSize: '0.67rem',
                 color: textColor, lineHeight: 1.52, margin: 0,
+                display: '-webkit-box',
+                WebkitLineClamp: 5,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
               }}>
                 {reply}
               </p>

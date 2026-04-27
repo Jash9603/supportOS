@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# routers/chatbot.py — Knowledge Base & Chatbot Configuration API
+# routers/chatbot.py - Knowledge Base & Chatbot Configuration API
 # -----------------------------------------------------------------------------
 #
 # WHAT IS THIS?

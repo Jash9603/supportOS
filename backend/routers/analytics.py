@@ -1,10 +1,10 @@
 # -----------------------------------------------------------------------------
-# routers/analytics.py — Analytics & Dashboard APIs
+# routers/analytics.py - Analytics & Dashboard APIs
 # -----------------------------------------------------------------------------
 #
 # TWO ENDPOINTS:
-#   GET /analytics/overview  — Quick KPIs for the Overview dashboard (Phase 4)
-#   GET /analytics/deep      — Full deep-dive for the Analytics page (Phase 4.5)
+#   GET /analytics/overview  - Quick KPIs for the Overview dashboard (Phase 4)
+#   GET /analytics/deep      - Full deep-dive for the Analytics page (Phase 4.5)
 #
 # The /deep endpoint accepts ?days=7 (or 30, 90) to filter by date range.
 # It returns all 6 analytic datasets in a single response.

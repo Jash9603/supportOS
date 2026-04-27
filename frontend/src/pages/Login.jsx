@@ -1,7 +1,7 @@
-// pages/Login.jsx — Login page
+// pages/Login.jsx - Login page
 // Clean centered auth form on cream background.
 // On success: sets httpOnly cookie server-side, redirects to /dashboard.
-// No glassmorphism — white card with thin ink border.
+// No glassmorphism - white card with thin ink border.
 
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
@@ -92,7 +92,7 @@ export default function Login() {
             disabled={loading}
             style={{ width: '100%', justifyContent: 'center', marginTop: 6, opacity: loading ? 0.7 : 1 }}
           >
-            {loading ? 'Signing in…' : 'Sign in →'}
+            {loading ? 'Signing in…' : 'Sign in' }
           </button>
         </form>
 

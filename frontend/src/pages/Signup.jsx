@@ -1,4 +1,4 @@
-// pages/Signup.jsx — Signup page
+// pages/Signup.jsx - Signup page
 // Creates a new organisation + owner account.
 // On success: server sets httpOnly cookie, redirects to /dashboard.
 // 4 fields: Name, Organisation name, Email, Password.
@@ -131,7 +131,7 @@ export default function Signup() {
             disabled={loading}
             style={{ width: '100%', justifyContent: 'center', marginTop: 6, opacity: loading ? 0.7 : 1 }}
           >
-            {loading ? 'Creating account…' : 'Create account →'}
+            {loading ? 'Creating account…' : 'Create account' }
           </button>
         </form>
 
