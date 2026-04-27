@@ -22,6 +22,7 @@ export default function WidgetChat() {
   const userId = searchParams.get('user_id') || 'default'
 
   const [messages, setMessages] = useState([])
+  const [orgName, setOrgName] = useState('Support')
   const [input, setInput] = useState('')
   const [connected, setConnected] = useState(false)
   const [statusText, setStatusText] = useState(null)
@@ -45,8 +46,9 @@ export default function WidgetChat() {
         const res = await fetch(`${apiUrl}/widget/${orgId}/history?session_id=${sessionId.current}`)
         if (res.ok) {
           const data = await res.json()
-          setMessages(data)
-          data.forEach(msg => seenIds.current.add(msg.id))
+          setOrgName(data.org_name || 'Support')
+          setMessages(data.messages || [])
+          ;(data.messages || []).forEach(msg => seenIds.current.add(msg.id))
         }
       } catch (e) {
         console.error("Failed to load history", e)
@@ -177,7 +179,7 @@ export default function WidgetChat() {
       {/* ── Header ──────────────────────────────────────────── */}
       <div style={styles.header}>
         <div style={styles.headerLeft}>
-          <span style={styles.logo}>Support<span style={{ color: '#F59E0B' }}>OS</span></span>
+          <span style={styles.logo}>{orgName}</span>
           <div style={{
             width: 8, height: 8, borderRadius: '50%',
             background: connected ? '#22C55E' : '#EF4444',
@@ -282,6 +284,13 @@ export default function WidgetChat() {
         >
           ↑
         </button>
+      </div>
+
+      {/* ── Footer Branding ─────────────────────────────────── */}
+      <div style={styles.footerBrand}>
+        <a href="https://supportos.site" target="_blank" rel="noopener noreferrer" style={styles.brandLink}>
+          ⚡ Powered by SupportOS
+        </a>
       </div>
       {/* CSS animations and markdown styles */}
       <style>{`
@@ -455,5 +464,17 @@ const styles = {
     justifyContent: 'center',
     flexShrink: 0,
     transition: 'opacity 0.2s',
+  },
+  footerBrand: {
+    textAlign: 'center',
+    padding: '6px 0 10px',
+    background: '#FFFFFF',
+  },
+  brandLink: {
+    fontSize: '0.65rem',
+    color: '#94A3B8',
+    textDecoration: 'none',
+    fontWeight: 500,
+    fontFamily: 'Inter, sans-serif',
   },
 }
