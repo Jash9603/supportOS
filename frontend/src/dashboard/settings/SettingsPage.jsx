@@ -5,6 +5,7 @@
 import { useState, useEffect } from 'react'
 import { useOutletContext } from 'react-router-dom'
 import api from '../../lib/api'
+import BillingGate from '../../components/BillingGate'
 
 // SVG Icons
 const icons = {
@@ -26,6 +27,9 @@ export default function SettingsPage() {
   // Section 3: Integration
   const [activeTab, setActiveTab] = useState('html')
   const [copied, setCopied] = useState(false)
+
+  // Billing Overlay
+  const [showBilling, setShowBilling] = useState(false)
 
   useEffect(() => {
     if (user) {
@@ -216,19 +220,82 @@ export default function RootLayout({ children }) {
         </form>
       </section>
 
+      {/* ── Ticket Usage ── */}
+      <section style={s.section}>
+        <h2 style={s.sectionTitle}>Ticket Usage & Quota</h2>
+        <p style={s.sectionSub}>Monitor your AI chatbot ticket allowance.</p>
+        <div style={{...s.card, padding: 0}}>
+          <div style={{ padding: '24px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
+              <span style={{ fontWeight: 600, color: '#0F172A', fontSize: '0.95rem' }}>Available Tickets</span>
+              <span style={{ 
+                fontWeight: 700, 
+                color: user.available_tickets === 0 ? '#EF4444' : '#6366F1',
+                fontSize: '1.05rem' 
+              }}>
+                {user.available_tickets}
+              </span>
+            </div>
+            <div style={{ width: '100%', height: 8, background: '#E2E8F0', borderRadius: 4, overflow: 'hidden', marginBottom: 12 }}>
+              <div style={{ 
+                width: `${user.available_tickets === 0 ? 100 : Math.min(100, (user.total_tickets_used / Math.max(1, user.available_tickets + user.total_tickets_used)) * 100)}%`, 
+                height: '100%', 
+                background: user.available_tickets === 0 ? '#EF4444' : '#6366F1',
+                transition: 'width 0.5s ease'
+              }} />
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748B' }}>
+                Total lifetime tickets used: <strong>{user.total_tickets_used}</strong>
+              </p>
+              {user.available_tickets === 0 && (
+                <span style={{ fontSize: '0.8rem', color: '#EF4444', fontWeight: 600, background: '#FEF2F2', padding: '4px 8px', borderRadius: 4 }}>
+                  Quota Exhausted
+                </span>
+              )}
+            </div>
+          </div>
+          <div style={{...s.cardFooter, display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+            <p style={{ margin: 0, fontSize: '0.85rem', color: '#94A3B8' }}>
+              Need more tickets? Upgrade your plan to instantly refill your balance.
+            </p>
+            <button 
+              onClick={() => setShowBilling(true)}
+              style={{...s.btnPrimary, background: '#0D0D0B', width: 'auto'}}
+            >
+              Upgrade Plan
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Render BillingGate Overlay if active */}
+      {showBilling && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 99999 }}>
+          {/* We add a close button since BillingGate usually locks the screen */}
+          <div 
+            onClick={() => setShowBilling(false)}
+            style={{ position: 'absolute', top: 24, right: 24, cursor: 'pointer', zIndex: 100000, background: 'rgba(0,0,0,0.5)', color: 'white', padding: '8px 16px', borderRadius: 20, fontSize: '0.85rem', fontWeight: 600 }}
+          >
+            Close ✕
+          </div>
+          <BillingGate user={user} isRenew={!!user.trial_ends_at} />
+        </div>
+      )}
+
       {/* ── Support ── */}
       <section style={s.section}>
         <h2 style={s.sectionTitle}>Support</h2>
         <p style={s.sectionSub}>Need help with your plan or technical integration?</p>
-        <div style={{...s.card, display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+        <div style={{...s.card, display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 24px'}}>
           <div>
             <h4 style={{ margin: '0 0 4px', color: '#0F172A', fontSize: '0.95rem' }}>Direct Support</h4>
             <p style={{ margin: 0, color: '#64748B', fontSize: '0.85rem' }}>
               We're here to help. Contact us directly for priority support.
             </p>
           </div>
-          <a href="mailto:support@supportos.com" style={s.btnSecondary}>
-            support@supportos.com
+          <a href="mailto:ontaraai@gmail.com" style={s.btnSecondary}>
+            ontaraai@gmail.com
           </a>
         </div>
       </section>

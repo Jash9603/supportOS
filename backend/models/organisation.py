@@ -10,6 +10,8 @@
 #   name                 → display name, e.g. "Acme Corp"
 #   slug                 → URL-safe short name, e.g. "acme-corp" (must be unique)
 #   plan                 → subscription tier: "free" | "pro" | "enterprise"
+#   available_tickets    → number of tickets remaining before cap
+#   total_tickets_used   → total lifetime usage 
 #   chatbot_enabled      → whether the AI chatbot is turned on for this org
 #   chatbot_config       → JSON blob: bot name, greeting message, color, etc.
 #   onboarding_completed → True once the founder finishes the setup wizard
@@ -39,7 +41,10 @@ class Organisation(Base):
     chatbot_config: Mapped[dict] = mapped_column(JSONB, default=dict, nullable=False)
     allowed_domains: Mapped[list[str]] = mapped_column(JSONB, default=list, nullable=False)
     
-    # Billing
+    # Billing & Usage
+    available_tickets: Mapped[int] = mapped_column(default=100, nullable=False)
+    total_tickets_used: Mapped[int] = mapped_column(default=0, nullable=False)
+    
     paypal_sub_id: Mapped[str] = mapped_column(String(255), nullable=True)
     sub_status: Mapped[str] = mapped_column(String(50), default="inactive", nullable=False)
     trial_ends_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)

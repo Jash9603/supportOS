@@ -17,5 +17,6 @@ from models.ticket import Ticket
 from models.message import Message
 from models.kb_document import KbDocument
 from models.notification import Notification
+from models.ticket_batch import TicketBatch
 
-__all__ = ["Organisation", "User", "Ticket", "Message", "KbDocument", "Notification"]
+__all__ = ["Organisation", "User", "Ticket", "Message", "KbDocument", "Notification", "TicketBatch"]

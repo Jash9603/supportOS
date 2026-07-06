@@ -351,13 +351,19 @@ async def get_chat_history(
     """
     from models.ticket import Ticket
     from models.message import Message
+    from models.organisation import Organisation
     
+    # 0. Get Org Name
+    org_res = await db.execute(select(Organisation).where(Organisation.id == org_id))
+    org = org_res.scalars().first()
+    org_name = org.name if org else "Support"
+
     # 1. Find the ticket for this session
     res = await db.execute(select(Ticket).where(Ticket.org_id == org_id, Ticket.session_id == session_id).limit(1))
     ticket = res.scalars().first()
     
     if not ticket:
-        return []
+        return {"org_name": org_name, "messages": []}
         
     # 2. Grab all messages
     msg_res = await db.execute(
@@ -368,13 +374,16 @@ async def get_chat_history(
     messages = msg_res.scalars().all()
     
     # 3. Format for the frontend WidgetChat
-    return [
-        {
-            "id": str(msg.id),
-            "body": msg.body,
-            "sender": msg.sender_type,
-            "time": msg.created_at.strftime("%I:%M %p")
-        }
-        for msg in messages
-    ]
+    return {
+        "org_name": org_name,
+        "messages": [
+            {
+                "id": str(msg.id),
+                "body": msg.body,
+                "sender": msg.sender_type,
+                "time": msg.created_at.strftime("%I:%M %p")
+            }
+            for msg in messages
+        ]
+    }
 

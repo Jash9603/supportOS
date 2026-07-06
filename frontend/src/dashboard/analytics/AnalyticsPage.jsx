@@ -20,7 +20,9 @@
 // -----------------------------------------------------------------------------
 
 import React, { useState, useEffect, useRef } from 'react'
+import { useOutletContext, Link } from 'react-router-dom'
 import api from '../../lib/api'
+import BillingGate from '../../components/BillingGate'
 import {
   AreaChart, Area, BarChart, Bar, LineChart, Line,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -40,13 +42,21 @@ const C = {
 }
 
 export default function AnalyticsPage() {
+  const { user } = useOutletContext()
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [days, setDays] = useState(7)
   const [exporting, setExporting] = useState(false)
   const reportRef = useRef(null)
+  const [showBilling, setShowBilling] = useState(false)
 
   useEffect(() => {
+    // If the user is on the free tier, do not fetch data.
+    if (user?.sub_status !== 'active') {
+      setLoading(false)
+      return
+    }
+    
     setLoading(true)
     api.get(`/analytics/deep?days=${days}`)
       .then(res => { setData(res.data); setLoading(false) })
@@ -103,14 +113,72 @@ export default function AnalyticsPage() {
 
   if (loading) {
     return (
-      <div className="analytics-page" style={s.page}>
-        <div className="analytics-header" style={s.header}>
-          <h1 style={s.title}>Analytics</h1>
-          <p style={s.subtitle}>Crunching your data...</p>
+      <div style={s.page}>
+        <div style={s.loader}>Gathering Deep Analytics...</div>
+      </div>
+    )
+  }
+
+  // ── PAYWALL FOR FREE TIER ──
+  if (user?.sub_status !== 'active') {
+    return (
+      <div style={s.page}>
+        <div style={s.headerRow}>
+          <div>
+            <h1 style={s.pageTitle}>Deep Analytics</h1>
+            <p style={s.pageSubtitle}>Understand customer sentiment, topics, and AI performance.</p>
+          </div>
         </div>
-        <div className="analytics-loading-grid" style={s.loadingGrid}>
-          {[1,2,3,4,5,6].map(i => <div key={i} style={s.skeletonCard} />)}
+        <div style={{
+          background: '#FFFFFF',
+          border: '1px solid #E2E8F0',
+          borderRadius: 16,
+          padding: '60px 20px',
+          textAlign: 'center',
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)',
+          marginTop: 24,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center'
+        }}>
+          <div style={{ background: '#EEF2FF', padding: 20, borderRadius: '50%', marginBottom: 20 }}>
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#6366F1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+          </div>
+          <h2 style={{ margin: '0 0 12px', color: '#0F172A', fontSize: '1.5rem', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
+            Analytics is a Premium Feature
+          </h2>
+          <p style={{ margin: '0 0 32px', color: '#64748B', maxWidth: 500, lineHeight: 1.6 }}>
+            Upgrade to the Starter or Growth plan to unlock powerful AI clustering, 
+            sentiment analysis, and agent performance tracking.
+          </p>
+          <button onClick={() => setShowBilling(true)} style={{
+            background: '#0D0D0B',
+            color: '#FFFFFF',
+            padding: '12px 24px',
+            borderRadius: 8,
+            fontWeight: 500,
+            border: 'none',
+            cursor: 'pointer',
+            transition: 'opacity 0.2s'
+          }} onMouseOver={e => e.target.style.opacity = '0.8'} onMouseOut={e => e.target.style.opacity = '1'}>
+            Upgrade Plan
+          </button>
         </div>
+
+        {/* Render BillingGate Overlay if active */}
+        {showBilling && (
+          <div style={{ position: 'fixed', inset: 0, zIndex: 99999 }}>
+            <div 
+              onClick={() => setShowBilling(false)}
+              style={{ position: 'absolute', top: 24, right: 24, cursor: 'pointer', zIndex: 100000, background: 'rgba(0,0,0,0.5)', color: 'white', padding: '8px 16px', borderRadius: 20, fontSize: '0.85rem', fontWeight: 600 }}
+            >
+              Close ✕
+            </div>
+            <BillingGate user={user} isRenew={!!user.trial_ends_at} />
+          </div>
+        )}
       </div>
     )
   }

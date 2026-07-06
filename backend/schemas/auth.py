@@ -41,6 +41,8 @@ class UserResponse(BaseModel):
     org_name: str         # org's display name (handy so frontend doesn't need a second API call)
     org_slug: str
     sub_status: str
+    available_tickets: int
+    total_tickets_used: int
     trial_ends_at: str | None = None
     subscription_ends_at: str | None = None
 

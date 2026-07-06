@@ -41,7 +41,8 @@ from core.config import settings
 
 # Convert async DB URL to sync (asyncpg → psycopg2)
 # Celery can't use async - it has its own event loop
-sync_db_url = settings.DATABASE_URL.replace("postgresql+asyncpg", "postgresql+psycopg2")
+# Also translate asyncpg's ?ssl=require to psycopg2's ?sslmode=require
+sync_db_url = settings.DATABASE_URL.replace("postgresql+asyncpg", "postgresql+psycopg2").replace("?ssl=require", "?sslmode=require")
 
 
 @celery_app.task(bind=True, max_retries=3)

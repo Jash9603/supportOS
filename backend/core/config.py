@@ -46,8 +46,8 @@ class Settings(BaseSettings):
     # Dodo Payments
     DODO_API_KEY: str = ""
     DODO_WEBHOOK_SECRET: str = ""
-    DODO_MONTHLY_PRODUCT_ID: str = ""
-    DODO_YEARLY_PRODUCT_ID: str = ""
+    DODO_STARTER_PRODUCT_ID: str = ""
+    DODO_GROWTH_PRODUCT_ID: str = ""
 
     # Contact / SMTP
     CONTACT_EMAIL: str = "jashkevdiya@gmail.com"

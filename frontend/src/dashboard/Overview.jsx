@@ -22,12 +22,44 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer
 } from 'recharts'
+import BillingGate from '../components/BillingGate'
 
 export default function Overview() {
   const { user } = useOutletContext()
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [showBilling, setShowBilling] = useState(false)
+  const [activating, setActivating] = useState(false)
+
+  // Handle Dodo Payments redirect - activate subscription after successful payment
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const payStatus = params.get('status')
+    const subscriptionId = params.get('subscription_id')
+    const plan = params.get('plan')
+
+    if (payStatus === 'succeeded' && subscriptionId) {
+      setActivating(true)
+      // Call backend to activate the subscription and create TicketBatch
+      api.post('/auth/activate-subscription', {
+        subscription_id: subscriptionId,
+        plan: plan || 'starter'
+      })
+        .then(() => {
+          // Clean URL params and reload to show updated plan
+          window.history.replaceState({}, document.title, window.location.pathname)
+          window.location.reload()
+        })
+        .catch(err => {
+          console.error('Failed to activate subscription:', err)
+          setActivating(false)
+        })
+    } else if (payStatus === 'failed' || payStatus === 'user_droped') {
+      setError('Payment was cancelled or failed. Please try again.')
+      window.history.replaceState({}, document.title, window.location.pathname)
+    }
+  }, [])
 
   useEffect(() => {
     api.get('/analytics/overview')
@@ -35,6 +67,14 @@ export default function Overview() {
       .catch(err => { setError(err.message); setLoading(false) })
   }, [])
 
+  if (activating) return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '60vh', gap: 16 }}>
+      <div style={{ width: 40, height: 40, border: '4px solid #E2E8F0', borderTopColor: '#6366F1', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+      <p style={{ fontFamily: 'Inter, sans-serif', color: '#4A4743', fontSize: '1.1rem', fontWeight: 600 }}>Activating your plan...</p>
+      <p style={{ fontFamily: 'Inter, sans-serif', color: '#94A3B8', fontSize: '0.85rem' }}>Please wait while we set up your tickets.</p>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    </div>
+  )
   if (loading) return <LoadingSkeleton />
   if (error) return <ErrorState message={error} />
 
@@ -59,8 +99,21 @@ export default function Overview() {
           <h1 style={styles.title}>Overview</h1>
           <p style={styles.subtitle}>Your support operations at a glance</p>
         </div>
-        <div style={{ fontWeight: 'bold', color: '#1F2937', background: '#F3F4F6', padding: '8px 16px', borderRadius: '8px', fontSize: '0.9rem' }}>
-          Plan: {planDisplay}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ fontWeight: 'bold', color: '#1F2937', background: '#F3F4F6', padding: '8px 16px', borderRadius: '8px', fontSize: '0.9rem' }}>
+            Plan: {planDisplay}
+          </div>
+          {user?.sub_status !== 'active' && (
+            <button 
+              onClick={() => setShowBilling(true)}
+              style={{
+                background: '#0D0D0B', color: '#FFFFFF', border: 'none', padding: '8px 16px', 
+                borderRadius: '8px', fontSize: '0.9rem', fontWeight: 600, cursor: 'pointer'
+              }}
+            >
+              Upgrade
+            </button>
+          )}
         </div>
       </div>
 
@@ -198,6 +251,19 @@ export default function Overview() {
           </div>
         </div>
       </div>
+
+      {/* Render BillingGate Overlay if active */}
+      {showBilling && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 99999 }}>
+          <div 
+            onClick={() => setShowBilling(false)}
+            style={{ position: 'absolute', top: 24, right: 24, cursor: 'pointer', zIndex: 100000, background: 'rgba(0,0,0,0.5)', color: 'white', padding: '8px 16px', borderRadius: 20, fontSize: '0.85rem', fontWeight: 600 }}
+          >
+            Close ✕
+          </div>
+          <BillingGate user={user} isRenew={!!user.trial_ends_at} />
+        </div>
+      )}
     </div>
   )
 }

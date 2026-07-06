@@ -29,18 +29,19 @@ async def create_checkout(
     """
     Generate an authenticated checkout session via Dodo Payments API
     """
-    if body.plan == "monthly":
-        product_id = settings.DODO_MONTHLY_PRODUCT_ID
-    elif body.plan == "yearly":
-        product_id = settings.DODO_YEARLY_PRODUCT_ID
+    if body.plan == "starter":
+        product_id = settings.DODO_STARTER_PRODUCT_ID
+    elif body.plan == "growth":
+        product_id = settings.DODO_GROWTH_PRODUCT_ID
     else:
         raise HTTPException(status_code=400, detail="Invalid plan selected")
 
     if not product_id:
         raise HTTPException(status_code=500, detail="Product ID missing in configuration")
 
-    # Use live mode URL (since your API Key appears to be a Production/Live key)
-    url = "https://live.dodopayments.com/checkouts"
+    # Use test mode URL for development, switch to live for production
+    # url = "https://live.dodopayments.com/checkouts"  # LIVE
+    url = "https://test.dodopayments.com/checkouts"  # TEST
     
     payload = {
         "product_cart": [
@@ -143,7 +144,18 @@ async def dodo_webhook(request: Request, db: AsyncSession = Depends(get_db)):
         else:
             new_expiry = datetime.utcnow() + timedelta(days=30)
             
-        print(f"[SUCCESS] Parsed event={event}, updating Org={org_id} to Active till {new_expiry}")
+        product_id = data.get("data", {}).get("product_id") or data.get("data", {}).get("subscription", {}).get("product_id")
+        
+        tickets_to_add = 0
+        plan_name = "free"
+        if product_id == settings.DODO_STARTER_PRODUCT_ID:
+            tickets_to_add = 1000
+            plan_name = "starter"
+        elif product_id == settings.DODO_GROWTH_PRODUCT_ID:
+            tickets_to_add = 5000
+            plan_name = "growth"
+
+        print(f"[SUCCESS] Parsed event={event}, updating Org={org_id} to Active till {new_expiry}. Refilling {tickets_to_add} tickets.")
             
         if org_id:
             await db.execute(
@@ -151,9 +163,20 @@ async def dodo_webhook(request: Request, db: AsyncSession = Depends(get_db)):
                 .where(Organisation.id == UUID(org_id))
                 .values(
                     sub_status="active",
-                    subscription_ends_at=new_expiry
+                    subscription_ends_at=new_expiry,
+                    plan=plan_name,
                 )
             )
+            if tickets_to_add > 0:
+                from models.ticket_batch import TicketBatch
+                batch = TicketBatch(
+                    org_id=UUID(org_id),
+                    initial_tickets=tickets_to_add,
+                    remaining_tickets=tickets_to_add,
+                    expires_at=new_expiry
+                )
+                db.add(batch)
+                
             await db.commit()
 
     elif event in ["subscription.cancelled", "payment.failed", "subscription.failed", "subscription.past_due"]:
@@ -193,9 +216,22 @@ async def apply_referral(
         .where(Organisation.id == current_user.org_id)
         .values(
             paypal_sub_id="referral_bypass",
-            sub_status="active"
+            sub_status="active",
+            plan="growth",
         )
     )
+    
+    from models.ticket_batch import TicketBatch
+    from datetime import datetime, timedelta
+    # 100 years expiry for lifetime referral promo
+    batch = TicketBatch(
+        org_id=current_user.org_id,
+        initial_tickets=5000,
+        remaining_tickets=5000,
+        expires_at=datetime.utcnow() + timedelta(days=365*100)
+    )
+    db.add(batch)
+    
     await db.commit()
 
     return {"message": "Referral applied successfully. Welcome to SupportOS!"}

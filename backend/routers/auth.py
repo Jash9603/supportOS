@@ -70,7 +70,24 @@ def _set_auth_cookie(response: Response, token: str) -> None:
 
 # ── Helper: build UserResponse from DB objects ────────────────────────────────
 
-def _build_user_response(user: User, org: Organisation) -> UserResponse:
+async def _build_user_response(user: User, org: Organisation, db: AsyncSession) -> UserResponse:
+    from models.ticket_batch import TicketBatch
+    from sqlalchemy import select, func, or_
+    
+    # Calculate true available tickets from valid batches
+    res = await db.execute(
+        select(func.sum(TicketBatch.remaining_tickets))
+        .where(TicketBatch.org_id == org.id)
+        .where(TicketBatch.remaining_tickets > 0)
+        .where(or_(TicketBatch.expires_at == None, TicketBatch.expires_at > func.now()))
+    )
+    true_available = res.scalar() or 0
+    
+    # Heal the cache if it drifted
+    if org.available_tickets != true_available:
+        org.available_tickets = true_available
+        await db.commit()
+
     trial_str = org.trial_ends_at.isoformat() if org.trial_ends_at else None
     sub_ends_str = org.subscription_ends_at.isoformat() if org.subscription_ends_at else None
     return UserResponse(
@@ -82,6 +99,8 @@ def _build_user_response(user: User, org: Organisation) -> UserResponse:
         org_name=org.name,
         org_slug=org.slug,
         sub_status=org.sub_status,
+        available_tickets=true_available,
+        total_tickets_used=org.total_tickets_used,
         trial_ends_at=trial_str,
         subscription_ends_at=sub_ends_str,
     )
@@ -133,7 +152,7 @@ async def signup(
     _set_auth_cookie(response, token)
 
     # 5. Return user info
-    return _build_user_response(user, org)
+    return await _build_user_response(user, org, db)
 
 
 # ── POST /auth/login ──────────────────────────────────────────────────────────
@@ -180,7 +199,7 @@ async def login(
     })
     _set_auth_cookie(response, token)
 
-    return _build_user_response(user, org)
+    return await _build_user_response(user, org, db)
 
 
 # ── POST /auth/logout ─────────────────────────────────────────────────────────
@@ -212,9 +231,10 @@ async def me(
     Frontend calls this on page load to check if session is still valid.
     """
     org = await get_org_by_id(db, current_user.org_id)
-    return _build_user_response(current_user, org)
+    return await _build_user_response(current_user, org, db)
 class ActivateSubRequest(BaseModel):
     subscription_id: str
+    plan: str
 
 @router.post("/activate-subscription")
 async def activate_subscription(
@@ -224,16 +244,32 @@ async def activate_subscription(
 ):
     """
     Called by frontend after PayPal approval.
-    Saves the subscription ID and marks the org as 'active'.
+    Saves the subscription ID, marks the org as 'active', and refills tickets.
     """
+    from datetime import datetime, timedelta
+    from models.ticket_batch import TicketBatch
+    
+    tickets_to_add = 1000 if body.plan == "starter" else 5000 if body.plan == "growth" else 0
+    
     from sqlalchemy import update
     await db.execute(
         update(Organisation)
         .where(Organisation.id == current_user.org_id)
         .values(
             paypal_sub_id=body.subscription_id,
-            sub_status="active"
+            sub_status="active",
+            plan=body.plan,
         )
     )
+    
+    if tickets_to_add > 0:
+        batch = TicketBatch(
+            org_id=current_user.org_id,
+            initial_tickets=tickets_to_add,
+            remaining_tickets=tickets_to_add,
+            expires_at=datetime.utcnow() + timedelta(days=30)
+        )
+        db.add(batch)
+        
     await db.commit()
     return {"message": "Subscription activated successfully"}

@@ -7,52 +7,8 @@ export default function BillingGate({ user, isRenew }) {
   const [loadingPlan, setLoadingPlan] = useState(null)
   const [error, setError] = useState('')
 
-  // Automatically check if the backend webhook updated the account
-  useEffect(() => {
-    // 1. Process URL Query Params from Dodo Payments Redirect
-    const timer = setTimeout(() => {
-      const params = new URLSearchParams(window.location.search)
-      const status = params.get('status')
-      
-      if (status === 'succeeded') {
-        setError('')
-        setLoadingPlan('succeeded') // Hijack this state as a visually pleasing loader
-      } else if (status === 'failed' || status === 'user_droped') {
-        setError('Payment was cancelled or failed. Please try again.')
-      }
-
-      // Cleanup query params so it doesn't persist on refresh
-      if (status) {
-        window.history.replaceState({}, document.title, window.location.pathname)
-      }
-    }, 100)
-
-    // 2. Poll Database for Webhook completion (max 5 times = 15 seconds)
-    let pollCount = 0
-    const intervalId = setInterval(async () => {
-      pollCount++
-      if (pollCount > 5) {
-        clearInterval(intervalId)
-        setLoadingPlan(null) // Break the infinite loader
-        setError('We could not verify your payment. If your card was charged, please contact support or try again.')
-        return
-      }
-
-      try {
-        const res = await authApi.me()
-        if (res.data.sub_status === 'active' && new Date(res.data.subscription_ends_at || res.data.trial_ends_at) > new Date()) {
-          window.location.reload()
-        }
-      } catch (err) {
-        // Ignore network errors but allow the timeout block above to eventually kill it
-      }
-    }, 3000)
-
-    return () => {
-      clearInterval(intervalId)
-      clearTimeout(timer)
-    }
-  }, [])
+  // Note: Post-payment activation is handled by Overview.jsx
+  // which detects the redirect query params and calls /auth/activate-subscription
 
   const handleApplyReferral = async () => {
     if (!referralCode.trim()) return
@@ -75,7 +31,7 @@ export default function BillingGate({ user, isRenew }) {
     try {
       const payload = {
         plan: planType,
-        success_url: `${window.location.origin}/dashboard?status=succeeded`,
+        success_url: `${window.location.origin}/dashboard?status=succeeded&plan=${planType}`,
         cancel_url: `${window.location.origin}/dashboard?status=failed`
       }
 
@@ -111,14 +67,15 @@ export default function BillingGate({ user, isRenew }) {
 
         <div className="billing-plans" style={styles.plansContainer}>
 
-          {/* ────── MONTHLY PLAN ────── */}
+          {/* ────── STARTER PLAN ────── */}
           <div style={styles.planCard}>
-            <h3 style={{ margin: 0, fontFamily: '"Plus Jakarta Sans", sans-serif' }}>Monthly</h3>
-            <p style={{ fontSize: '0.85rem', color: '#64748B' }}>$19/month</p>
+            <h3 style={{ margin: 0, fontFamily: '"Plus Jakarta Sans", sans-serif' }}>Starter</h3>
+            <p style={{ fontSize: '0.85rem', color: '#64748B' }}>1,000 Tickets / month</p>
+            <h2 style={{ margin: '16px 0 8px', fontSize: '2rem' }}>$29<span style={{ fontSize: '1rem', color: '#64748B' }}>/mo</span></h2>
 
             <div style={{ marginTop: 24 }}>
               <button
-                onClick={() => handleSubscribe('monthly')}
+                onClick={() => handleSubscribe('starter')}
                 disabled={loadingPlan !== null}
                 style={{ 
                   ...styles.btn, 
@@ -128,30 +85,31 @@ export default function BillingGate({ user, isRenew }) {
                   opacity: loadingPlan ? 0.7 : 1 
                 }}
               >
-                {loadingPlan === 'succeeded' ? 'Verifying Checkout...' : loadingPlan === 'monthly' ? 'Loading...' : 'Subscribe'}
+                {loadingPlan === 'succeeded' ? 'Verifying Checkout...' : loadingPlan === 'starter' ? 'Loading...' : 'Subscribe'}
               </button>
             </div>
           </div>
 
-          {/* ────── YEARLY PLAN ────── */}
+          {/* ────── GROWTH PLAN ────── */}
           <div style={styles.planCard}>
-            <h3 style={{ margin: 0, fontFamily: '"Plus Jakarta Sans", sans-serif' }}>Yearly</h3>
-            <p style={{ fontSize: '0.85rem', color: '#64748B' }}>$199/year (Save 12%)</p>
+            <h3 style={{ margin: 0, fontFamily: '"Plus Jakarta Sans", sans-serif' }}>Growth</h3>
+            <p style={{ fontSize: '0.85rem', color: '#64748B' }}>5,000 Tickets / month</p>
+            <h2 style={{ margin: '16px 0 8px', fontSize: '2rem' }}>$99<span style={{ fontSize: '1rem', color: '#64748B' }}>/mo</span></h2>
 
             <div style={{ marginTop: 24 }}>
               <button
-                onClick={() => handleSubscribe('yearly')}
+                onClick={() => handleSubscribe('growth')}
                 disabled={loadingPlan !== null}
                 style={{ 
                   ...styles.btn, 
-                  background: '#C8841A', 
+                  background: '#6366F1', 
                   color: 'white', 
                   border: 'none', 
                   display: 'block', 
                   opacity: loadingPlan ? 0.7 : 1 
                 }}
               >
-                {loadingPlan === 'succeeded' ? 'Verifying Checkout...' : loadingPlan === 'yearly' ? 'Loading...' : 'Subscribe'}
+                {loadingPlan === 'succeeded' ? 'Verifying Checkout...' : loadingPlan === 'growth' ? 'Loading...' : 'Subscribe'}
               </button>
             </div>
           </div>

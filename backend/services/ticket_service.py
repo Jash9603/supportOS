@@ -2,6 +2,7 @@ import json
 import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from sqlalchemy import func
 from sqlalchemy.orm import selectinload
 from fastapi import HTTPException
 import uuid
@@ -34,6 +35,37 @@ async def get_ticket_by_session(db: AsyncSession, org_id: uuid.UUID, session_id:
     return result.scalars().first()
 
 async def create_ticket(db: AsyncSession, org_id: uuid.UUID, data: TicketCreate) -> Ticket:
+    from models.organisation import Organisation
+    from models.ticket_batch import TicketBatch
+    from sqlalchemy.sql.expression import nulls_last
+    
+    # 1. Fetch the organisation
+    org_res = await db.execute(select(Organisation).where(Organisation.id == org_id))
+    org = org_res.scalars().first()
+    
+    if not org:
+        raise HTTPException(status_code=404, detail="Organisation not found")
+        
+    # 2. Find the active TicketBatch that expires soonest
+    batches_res = await db.execute(
+        select(TicketBatch)
+        .where(TicketBatch.org_id == org_id)
+        .where(TicketBatch.remaining_tickets > 0)
+        .where((TicketBatch.expires_at == None) | (TicketBatch.expires_at > func.now()))
+        .order_by(nulls_last(TicketBatch.expires_at.asc()), TicketBatch.created_at.asc())
+    )
+    valid_batch = batches_res.scalars().first()
+
+    if not valid_batch:
+        raise HTTPException(status_code=403, detail="Ticket quota exceeded. Please upgrade your plan.")
+        
+    # 3. Deduct a ticket from the batch and update total usage
+    valid_batch.remaining_tickets -= 1
+    org.total_tickets_used += 1
+    if org.available_tickets > 0:
+        org.available_tickets -= 1
+
+    # 3. Create the ticket
     new_ticket = Ticket(
         org_id=org_id,
         channel=data.channel,

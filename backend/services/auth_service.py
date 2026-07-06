@@ -116,6 +116,16 @@ async def create_org_and_user(
         role="owner",
     )
     db.add(user)
+    
+    from models.ticket_batch import TicketBatch
+    batch = TicketBatch(
+        org_id=org.id,
+        initial_tickets=100,
+        remaining_tickets=100,
+        expires_at=None # Lifetime free tier
+    )
+    db.add(batch)
+    
     await db.commit()
 
     # Refresh so all server-default fields (created_at, etc.) are populated
