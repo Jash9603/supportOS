@@ -40,8 +40,8 @@ async def create_checkout(
         raise HTTPException(status_code=500, detail="Product ID missing in configuration")
 
     # Use test mode URL for development, switch to live for production
-    # url = "https://live.dodopayments.com/checkouts"  # LIVE
-    url = "https://test.dodopayments.com/checkouts"  # TEST
+    url = "https://live.dodopayments.com/checkouts"  # LIVE
+    # url = "https://test.dodopayments.com/checkouts"  # TEST
     
     payload = {
         "product_cart": [
