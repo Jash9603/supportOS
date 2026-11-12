@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" width="1200" height="700" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+<defs><marker id="a-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#58a6ff"/></marker><marker id="a-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#3fb950"/></marker><marker id="a-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#d29922"/></marker><marker id="a-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#bc8cff"/></marker><marker id="a-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#f85149"/></marker><marker id="a-teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#39c5cf"/></marker><marker id="a-pink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#f778ba"/></marker><marker id="a-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8b949e"/></marker></defs>
+<rect width="1200" height="700" rx="14" fill="#0d1117"/><rect x="0.5" y="0.5" width="1199" height="699" rx="14" fill="none" stroke="#30363d"/>
+<text x="28" y="40" font-size="20" fill="#e6edf3" font-weight="700" text-anchor="start">SupportOS architecture</text>
+<text x="28" y="62" font-size="13" fill="#8b949e" font-weight="400" text-anchor="start">Widget → LangGraph agent → human inbox, with documents ingested in the background</text>
+<rect x="30" y="85" width="230" height="590" rx="12" fill="#58a6ff" fill-opacity="0.04" stroke="#58a6ff" stroke-opacity="0.45" stroke-dasharray="5 4"/>
+<text x="44" y="107" font-size="11" fill="#58a6ff" font-weight="700" text-anchor="start">CLIENTS</text>
+<rect x="290" y="85" width="560" height="590" rx="12" fill="#3fb950" fill-opacity="0.04" stroke="#3fb950" stroke-opacity="0.45" stroke-dasharray="5 4"/>
+<text x="304" y="107" font-size="11" fill="#3fb950" font-weight="700" text-anchor="start">FASTAPI BACKEND</text>
+<rect x="880" y="85" width="290" height="590" rx="12" fill="#bc8cff" fill-opacity="0.04" stroke="#bc8cff" stroke-opacity="0.45" stroke-dasharray="5 4"/>
+<text x="894" y="107" font-size="11" fill="#bc8cff" font-weight="700" text-anchor="start">DATA &amp; AI SERVICES</text>
+<rect x="50" y="120" width="190" height="84" rx="9" fill="#161b22" stroke="#58a6ff" stroke-width="1.5"/><rect x="50" y="120" width="5" height="84" rx="2" fill="#58a6ff"/>
+<text x="147.0" y="144" font-size="14" fill="#e6edf3" font-weight="700" text-anchor="middle">Chat widget</text>
+<text x="147.0" y="163" font-size="11.5" fill="#8b949e" font-weight="400" text-anchor="middle">React · embedded on</text>
+<text x="147.0" y="179" font-size="11.5" fill="#8b949e" font-weight="400" text-anchor="middle">the customer's site</text>
+<rect x="50" y="420" width="190" height="150" rx="9" fill="#161b22" stroke="#58a6ff" stroke-width="1.5"/><rect x="50" y="420" width="5" height="150" rx="2" fill="#58a6ff"/>
+<text x="147.0" y="444" font-size="14" fill="#e6edf3" font-weight="700" text-anchor="middle">Founder dashboard</text>
+<text x="147.0" y="463" font-size="11.5" fill="#8b949e" font-weight="400" text-anchor="middle">Inbox (live tickets)</text>
+<text x="147.0" y="479" font-size="11.5" fill="#8b949e" font-weight="400" text-anchor="middle">Chatbot: upload docs</text>
+<text x="147.0" y="495" font-size="11.5" fill="#8b949e" font-weight="400" text-anchor="middle">Analytics: topics, sentiment</text>
+<rect x="310" y="120" width="520" height="52" rx="9" fill="#161b22" stroke="#3fb950" stroke-width="1.5"/><rect x="310" y="120" width="5" height="52" rx="2" fill="#3fb950"/>
+<text x="572.0" y="144" font-size="14" fill="#e6edf3" font-weight="700" text-anchor="middle">WebSocket  /ws/{org_id}</text>
+<rect x="310" y="200" width="520" height="215" rx="12" fill="#d29922" fill-opacity="0.04" stroke="#d29922" stroke-opacity="0.45" stroke-dasharray="5 4"/>
+<text x="324" y="222" font-size="11" fill="#d29922" font-weight="700" text-anchor="start"></text>
+<text x="815" y="222" font-size="11" fill="#d29922" font-weight="700" text-anchor="end">LANGGRAPH SUPPORT AGENT</text>
+<rect x="325" y="235" width="140" height="70" rx="9" fill="#161b22" stroke="#d29922" stroke-width="1.5"/><rect x="325" y="235" width="5" height="70" rx="2" fill="#d29922"/>
+<text x="397.0" y="259" font-size="14" fill="#e6edf3" font-weight="700" text-anchor="middle">Retriever</text>
+<text x="397.0" y="278" font-size="11.5" fill="#8b949e" font-weight="400" text-anchor="middle">top-5 chunks</text>
+<text x="397.0" y="294" font-size="11.5" fill="#8b949e" font-weight="400" text-anchor="middle">+ confidence</text>
+<rect x="490" y="235" width="150" height="70" rx="9" fill="#161b22" stroke="#d29922" stroke-width="1.5"/><rect x="490" y="235" width="5" height="70" rx="2" fill="#d29922"/>
+<text x="567.0" y="259" font-size="14" fill="#e6edf3" font-weight="700" text-anchor="middle">Escalation check</text>
+<text x="567.0" y="278" font-size="11.5" fill="#8b949e" font-weight="400" text-anchor="middle">asked for human?</text>
+<text x="567.0" y="294" font-size="11.5" fill="#8b949e" font-weight="400" text-anchor="middle">low confidence?</text>
+<rect x="665" y="235" width="150" height="70" rx="9" fill="#161b22" stroke="#d29922" stroke-width="1.5"/><rect x="665" y="235" width="5" height="70" rx="2" fill="#d29922"/>
+<text x="742.0" y="259" font-size="14" fill="#e6edf3" font-weight="700" text-anchor="middle">Responder</text>
+<text x="742.0" y="278" font-size="11.5" fill="#8b949e" font-weight="400" text-anchor="middle">GPT-4o-mini</text>
+<text x="742.0" y="294" font-size="11.5" fill="#8b949e" font-weight="400" text-anchor="middle">streamed tokens</text>
+<path d="M465,270 L490,270" fill="none" stroke="#d29922" stroke-width="1.6" marker-end="url(#a-orange)"/>
+<path d="M640,270 L665,270" fill="none" stroke="#d29922" stroke-width="1.6" marker-end="url(#a-orange)"/>
+<rect x="640.8" y="247" width="22.4" height="16" rx="4" fill="#0d1117"/>
+<text x="652" y="258" font-size="11" fill="#d29922" font-weight="600" text-anchor="middle">no</text>
+<rect x="490" y="335" width="150" height="62" rx="9" fill="#161b22" stroke="#f85149" stroke-width="1.5"/><rect x="490" y="335" width="5" height="62" rx="2" fill="#f85149"/>
+<text x="567.0" y="359" font-size="14" fill="#e6edf3" font-weight="700" text-anchor="middle">Ticket → human</text>
+<text x="567.0" y="378" font-size="11.5" fill="#8b949e" font-weight="400" text-anchor="middle">needs_human = true</text>
+<path d="M565,305 L565,335" fill="none" stroke="#f85149" stroke-width="1.6" marker-end="url(#a-red)"/>
+<rect x="565.7" y="313" width="28.6" height="16" rx="4" fill="#0d1117"/>
+<text x="580" y="324" font-size="11" fill="#f85149" font-weight="600" text-anchor="middle">yes</text>
+<rect x="310" y="440" width="250" height="60" rx="9" fill="#161b22" stroke="#3fb950" stroke-width="1.5"/><rect x="310" y="440" width="5" height="60" rx="2" fill="#3fb950"/>
+<text x="437.0" y="464" font-size="14" fill="#e6edf3" font-weight="700" text-anchor="middle">REST routers</text>
+<text x="437.0" y="483" font-size="11.5" fill="#8b949e" font-weight="400" text-anchor="middle">auth · tickets · chatbot · billing</text>
+<rect x="580" y="440" width="250" height="60" rx="9" fill="#161b22" stroke="#3fb950" stroke-width="1.5"/><rect x="580" y="440" width="5" height="60" rx="2" fill="#3fb950"/>
+<text x="707.0" y="464" font-size="14" fill="#e6edf3" font-weight="700" text-anchor="middle">Analytics services</text>
+<text x="707.0" y="483" font-size="11.5" fill="#8b949e" font-weight="400" text-anchor="middle">question clustering · sentiment</text>
+<rect x="310" y="530" width="520" height="84" rx="9" fill="#161b22" stroke="#39c5cf" stroke-width="1.5"/><rect x="310" y="530" width="5" height="84" rx="2" fill="#39c5cf"/>
+<text x="572.0" y="554" font-size="14" fill="#e6edf3" font-weight="700" text-anchor="middle">Celery worker  ·  ingest_document</text>
+<text x="572.0" y="573" font-size="11.5" fill="#8b949e" font-weight="400" text-anchor="middle">PDF/TXT → ~512-word chunks → embeddings</text>
+<text x="572.0" y="589" font-size="11.5" fill="#8b949e" font-weight="400" text-anchor="middle">status: processing → indexed / failed</text>
+<path d="M900,130 v70 a125.0,10 0 0 0 250,0 v-70" fill="#161b22" stroke="#f85149" stroke-width="1.5"/><ellipse cx="1025.0" cy="130" rx="125.0" ry="10" fill="#161b22" stroke="#f85149" stroke-width="1.5"/>
+<text x="1025.0" y="154" font-size="14" fill="#e6edf3" font-weight="700" text-anchor="middle">Redis</text>
+<text x="1025.0" y="173" font-size="11.5" fill="#8b949e" font-weight="400" text-anchor="middle">agent state per session (24h TTL)</text>
+<text x="1025.0" y="189" font-size="11.5" fill="#8b949e" font-weight="400" text-anchor="middle">pub/sub: conv:{session}, tickets:{org}</text>
+<path d="M900,245 v66 a125.0,10 0 0 0 250,0 v-66" fill="#161b22" stroke="#bc8cff" stroke-width="1.5"/><ellipse cx="1025.0" cy="245" rx="125.0" ry="10" fill="#161b22" stroke="#bc8cff" stroke-width="1.5"/>
+<text x="1025.0" y="269" font-size="14" fill="#e6edf3" font-weight="700" text-anchor="middle">Qdrant</text>
+<text x="1025.0" y="288" font-size="11.5" fill="#8b949e" font-weight="400" text-anchor="middle">one collection per org</text>
+<text x="1025.0" y="304" font-size="11.5" fill="#8b949e" font-weight="400" text-anchor="middle">org_{id}_kb</text>
+<rect x="900" y="345" width="250" height="62" rx="9" fill="#161b22" stroke="#bc8cff" stroke-width="1.5"/><rect x="900" y="345" width="5" height="62" rx="2" fill="#bc8cff"/>
+<text x="1027.0" y="369" font-size="14" fill="#e6edf3" font-weight="700" text-anchor="middle">OpenAI</text>
+<text x="1027.0" y="388" font-size="11.5" fill="#8b949e" font-weight="400" text-anchor="middle">text-embedding-3-small · GPT-4o-mini</text>
+<path d="M900,440 v80 a125.0,10 0 0 0 250,0 v-80" fill="#161b22" stroke="#58a6ff" stroke-width="1.5"/><ellipse cx="1025.0" cy="440" rx="125.0" ry="10" fill="#161b22" stroke="#58a6ff" stroke-width="1.5"/>
+<text x="1025.0" y="464" font-size="14" fill="#e6edf3" font-weight="700" text-anchor="middle">PostgreSQL</text>
+<text x="1025.0" y="483" font-size="11.5" fill="#8b949e" font-weight="400" text-anchor="middle">orgs · tickets · messages</text>
+<text x="1025.0" y="499" font-size="11.5" fill="#8b949e" font-weight="400" text-anchor="middle">notifications · kb_documents</text>
+<path d="M240,160 L310,146" fill="none" stroke="#58a6ff" stroke-width="1.6" marker-end="url(#a-blue)" marker-start="url(#a-blue)"/>
+<rect x="257.6" y="127" width="34.8" height="16" rx="4" fill="#0d1117"/>
+<text x="275" y="138" font-size="11" fill="#58a6ff" font-weight="600" text-anchor="middle">chat</text>
+<path d="M570,172 L570,200" fill="none" stroke="#3fb950" stroke-width="1.6" marker-end="url(#a-green)"/>
+<path d="M830,146 L900,160" fill="none" stroke="#f85149" stroke-width="1.6" stroke-dasharray="6 4" marker-end="url(#a-red)" marker-start="url(#a-red)"/>
+<rect x="817.6" y="127" width="96.8" height="16" rx="4" fill="#0d1117"/>
+<text x="866" y="138" font-size="11" fill="#f85149" font-weight="600" text-anchor="middle">state + events</text>
+<path d="M395,235 L395,190 L872,190 L872,270 L900,270" fill="none" stroke="#bc8cff" stroke-width="1.6" stroke-dasharray="6 4" marker-end="url(#a-purple)"/>
+<text x="730" y="184" font-size="11" fill="#bc8cff" font-weight="600" text-anchor="middle">vector search (cosine)</text>
+<path d="M815,290 L842,290 L842,376 L900,376" fill="none" stroke="#bc8cff" stroke-width="1.6" stroke-dasharray="6 4" marker-end="url(#a-purple)"/>
+<path d="M240,480 L310,470" fill="none" stroke="#58a6ff" stroke-width="1.6" marker-end="url(#a-blue)"/>
+<rect x="242.1" y="451" width="65.80000000000001" height="16" rx="4" fill="#0d1117"/>
+<text x="275" y="462" font-size="11" fill="#58a6ff" font-weight="600" text-anchor="middle">REST + WS</text>
+<path d="M830,470 L900,480" fill="none" stroke="#58a6ff" stroke-width="1.6" stroke-dasharray="6 4" marker-end="url(#a-blue)"/>
+<path d="M830,572 L858,572 L858,300 L900,300" fill="none" stroke="#39c5cf" stroke-width="1.6" stroke-dasharray="6 4" marker-end="url(#a-teal)"/>
+<path d="M830,596 L886,596 L886,515 L900,515" fill="none" stroke="#39c5cf" stroke-width="1.6" stroke-dasharray="6 4" marker-end="url(#a-teal)"/>
+</svg>
