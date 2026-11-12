@@ -2,7 +2,7 @@
 
 **AI customer support for 0 to 20 person startups.** Drop a chat widget on your site and customers get instant answers from your own docs. Anything the bot can't resolve escalates to your inbox with the full conversation attached.
 
-![SupportOS architecture](docs/architecture.svg)
+![SupportOS architecture](/architecture.svg)
 
 ## The problem
 
